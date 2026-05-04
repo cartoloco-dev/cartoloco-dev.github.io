@@ -20,7 +20,7 @@
     <circle cx="52" cy="152" r="6" fill="#444"/>
     <circle cx="140" cy="152" r="14" fill="#111" stroke="#888" stroke-width="4"/>
     <circle cx="140" cy="152" r="6" fill="#444"/>
-    <text x="96" y="30" font-family="sans-serif" font-weight="bold" font-size="22" text-anchor="middle" fill="#ffd000">CARTO</text>
+    <text x="96" y="60" font-family="sans-serif" font-weight="bold" font-size="22" text-anchor="middle" fill="#ffd000">CARTO</text>
     <text x="96" y="60" font-family="sans-serif" font-weight="bold" font-size="22" text-anchor="middle" fill="#ffd000" dy="0">
       <tspan fill="#4488ff">LOCO</tspan>
     </text>
@@ -49,8 +49,54 @@
 
 </script>
 <title>CARTOLOCO TOOL</title>
-<link rel="manifest" href="data:application/json;charset=utf-8,{%20%20%22name%22:%20%22CartoloCo%20Tool%22,%20%20%22short_name%22:%20%22CartoloCo%22,%20%20%22description%22:%20%22Générateur%20de%20patrons%20train%20carton%20pour%20découpe%20laser%22,%20%20%22start_url%22:%20%22.%22,%20%20%22display%22:%20%22standalone%22,%20%20%22background_color%22:%20%22#f5f0e8%22,%20%20%22theme_color%22:%20%22#1e5fc9%22,%20%20%22orientation%22:%20%22landscape%22,%20%20%22icons%22:%20[%20%20%20%20{%20%22src%22:%20%22data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'><rect%20width='192'%20height='192'%20fill='%231a2030'%20rx='28'/><text%20x='96'%20y='75'%20text-anchor='middle'%20font-size='42'%20font-weight='900'%20font-family='sans-serif'%20fill='%231e5fc9'>CARTO</text><text%20x='96'%20y='128'%20text-anchor='middle'%20font-size='42'%20font-weight='900'%20font-family='sans-serif'%20fill='%23f0b429'>LOCO</text><text%20x='96'%20y='165'%20text-anchor='middle'%20font-size='14'%20font-family='sans-serif'%20fill='%23ffffff'>Train%20Design</text></svg>%22,%20%22sizes%22:%20%22192x192%22,%20%22type%22:%20%22image/svg+xml%22%20}%20%20]}">
+<!-- Manifest généré dynamiquement par script (plus fiable qu'un data: URI sur certains navigateurs) -->
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CartoloCo">
+<script>
+(function() {
+  // Icône SVG : CARTO (bleu) au-dessus, LOCO (jaune) au milieu, Train Design (blanc) en bas
+  const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1a2030" rx="76"/>
+  <text x="256" y="180" text-anchor="middle" font-size="110" font-weight="900" font-family="Syne, Helvetica, Arial, sans-serif" fill="#1e5fc9" letter-spacing="-2">CARTO</text>
+  <text x="256" y="320" text-anchor="middle" font-size="110" font-weight="900" font-family="Syne, Helvetica, Arial, sans-serif" fill="#f0b429" letter-spacing="-2">LOCO</text>
+  <text x="256" y="410" text-anchor="middle" font-size="38" font-weight="400" font-family="DM Mono, Courier, monospace" fill="#ffffff" letter-spacing="3">TRAIN DESIGN</text>
+</svg>`;
+  const iconBlob = new Blob([iconSvg], { type: 'image/svg+xml' });
+  const iconUrl  = URL.createObjectURL(iconBlob);
+
+  const manifest = {
+    name: 'CartoloCo Tool',
+    short_name: 'CartoloCo',
+    description: 'Générateur de patrons train carton pour découpe laser',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#1a2030',
+    theme_color: '#1a2030',
+    orientation: 'landscape',
+    icons: [
+      { src: iconUrl, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+      { src: iconUrl, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+    ]
+  };
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  const manifestUrl  = URL.createObjectURL(manifestBlob);
+  const link = document.createElement('link');
+  link.rel  = 'manifest';
+  link.href = manifestUrl;
+  document.head.appendChild(link);
+
+  // Apple touch icon (iOS Safari)
+  const linkAT = document.createElement('link');
+  linkAT.rel = 'apple-touch-icon';
+  linkAT.href = iconUrl;
+  document.head.appendChild(linkAT);
+
+  // Empêcher Chrome d'afficher l'icône d'installation PWA en bas à droite
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); });
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="CartoLoco">
@@ -148,8 +194,8 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:22px;height:22px;b
 .rbtn{flex:1;min-width:0;padding:8px 5px;text-align:center;font-family:'DM Mono',monospace;font-size:0.67rem;background:var(--light);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
 .rbtn.active{background:var(--text);color:var(--bg);border-color:var(--text);}
 
-.ckrow{display:flex;align-items:center;gap:8px;font-size:0.72rem;cursor:pointer;user-select:none;margin-bottom:8px;}
-.ckrow input{cursor:pointer;accent-color:var(--accent);width:18px;height:18px;}
+.ckrow{display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:'DM Mono',monospace;font-size:0.72rem;cursor:pointer;user-select:none;margin-bottom:8px;}
+.ckrow input{cursor:pointer;accent-color:var(--accent);width:18px;height:18px;flex-shrink:0;order:2;}
 
 .btns{padding:12px 16px 28px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
 .btn{padding:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;letter-spacing:0.04em;border:none;border-radius:8px;cursor:pointer;text-transform:uppercase;transition:opacity 0.15s;}
@@ -274,7 +320,8 @@ body { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 /* === LAYOUT === */
 body{margin:0;}
 header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
-#panel-nav{position:fixed;top:44px;left:0;right:0;z-index:999;height:44px;overflow-x:auto;scrollbar-width:none;}
+#panel-nav{position:fixed;top:44px;left:0;right:0;z-index:999;height:44px;background:#1e1a14;display:flex;gap:3px;padding:3px 6px;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;border-bottom:2px solid rgba(255,255,255,0.1);}
+#panel-nav::-webkit-scrollbar{display:none;}
 
 .panel-scroll{min-height:unset;}
 .canvas-area{position:fixed!important;top:88px;left:320px;right:0;bottom:0;display:flex;flex-direction:column;overflow:hidden;background:var(--light);}
@@ -379,6 +426,31 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
 .tri-btn:hover { background: #e0c89a; }
 .tri-btn:active { background: #b89a6a; box-shadow: inset 0 1px 2px rgba(0,0,0,0.3); }
 .tri-btn.active { background: #f0b429; border-color: #6e4a0a; }
+
+.tri-group {
+  display: flex;
+  gap: 3px;
+  padding: 5px 4px 3px 4px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 6px;
+  position: relative;
+  align-items: center;
+}
+.tri-group::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -7px;
+  left: 6px;
+  font-size: 0.5rem;
+  font-family: DM Mono, monospace;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.6);
+  background: #1e1a14;
+  padding: 0 4px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -395,32 +467,39 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
   </div>
 </header>
 
-<div id="panel-nav" style="position:fixed;top:44px;left:0;right:0;height:44px;z-index:999;background:#1e1a14;display:flex;gap:3px;padding:3px 6px;align-items:center;overflow-x:auto;"  style="flex-shrink:0;display:flex;flex-direction:row;flex-wrap:nowrap;gap:3px;padding:4px 8px;background:#1e1a14;border-bottom:2px solid rgba(255,255,255,0.1);align-items:center;flex-shrink:0;overflow-x:auto;scrollbar-width:none">
+<div id="panel-nav">
     <div style="width:1px;background:rgba(255,255,255,0.2);align-self:stretch;margin:0 2px"></div>
 </span>
-    <button onclick="navTo('sec-dims')"         class="tri-btn" title="Dimensions">DIM</button>
-    <button onclick="navTo('sec-toit')"          class="tri-btn" title="Toit">TOI</button>
-    <button onclick="navTo('section-loco')"      class="tri-btn" title="Nez">NEZ</button>
-    <button onclick="navTo('sec-chasse')"        class="tri-btn" title="Chasse-pierre">CHP</button>
-    <button onclick="navTo('sec-pare-chocs')"     class="tri-btn" title="Pare-chocs">PCH</button>
-    <button onclick="navTo('sec-encoche-face')"  class="tri-btn" title="Encoche face">ENC</button>
-    <button onclick="navTo('sec-fen')"           class="tri-btn" title="Fenêtres">FEN</button>
-    <button onclick="navTo('sec-rain')"          class="tri-btn" title="Rainures">RAI</button>
-    <button onclick="navTo('sec-phares')"        class="tri-btn" title="Phares">PHA</button>
-    <button onclick="navTo('sec-porte')"         class="tri-btn" title="Portes">POR</button>
-    <button onclick="navTo('sec-couloir')"       class="tri-btn" title="Couloir">COU</button>
-    <button onclick="navTo('sec-tampons')"       class="tri-btn" title="Tampons">TAM</button>
-    <button onclick="navTo('sec-relief')"        class="tri-btn" title="Relief">REL</button>
-    <button onclick="navTo('sec-equip')"         class="tri-btn" title="Équipements">EQU</button>
-    <button onclick="navTo('sec-marques')"       class="tri-btn" title="Marques">MAR</button>
-    <button onclick="navTo('sec-logo')"          class="tri-btn" title="Logo">LOG</button>
-    <button onclick="navTo('sec-grille')"        class="tri-btn" title="Grille">GRI</button>
-    <button onclick="navTo('sec-bogies')"        class="tri-btn" title="Bogies">BOG</button>
+    <div class="tri-group" data-label="Bases">
+      <button onclick="navTo('sec-dims')"         class="tri-btn" title="Dimensions">DIM</button>
+      <button onclick="navTo('sec-toit')"          class="tri-btn" title="Toit">TOI</button>
+      <button onclick="navTo('section-loco')"      class="tri-btn" title="Nez">NEZ</button>
+      <button onclick="navTo('sec-fen')"           class="tri-btn" title="Fenêtres">FEN</button>
+      <button onclick="navTo('sec-porte')"         class="tri-btn" title="Portes">POR</button>
+      <button onclick="navTo('sec-phares')"        class="tri-btn" title="Phares">PHA</button>
+    </div>
+    <div class="tri-group" data-label="Ornements">
+      <button onclick="navTo('sec-encoche-face')"  class="tri-btn" title="Encoche face">ENC</button>
+      <button onclick="navTo('sec-relief')"        class="tri-btn" title="Relief">REL</button>
+      <button onclick="navTo('sec-rain')"          class="tri-btn" title="Rainures">RAI</button>
+      <button onclick="navTo('sec-couloir')"       class="tri-btn" title="Couloir">COU</button>
+      <button onclick="navTo('sec-marques')"       class="tri-btn" title="Marques">MAR</button>
+      <button onclick="navTo('sec-logo')"          class="tri-btn" title="Logo">LOG</button>
+      <button onclick="navTo('sec-grille')"        class="tri-btn" title="Grille">GRI</button>
+    </div>
+    <div class="tri-group" data-label="Equipements">
+      <button onclick="navTo('sec-pare-chocs')"    class="tri-btn" title="Pare-chocs">PCH</button>
+      <button onclick="navTo('sec-chasse')"        class="tri-btn" title="Chasse-pierre">CHP</button>
+      <button onclick="navTo('sec-equip')"         class="tri-btn" title="Équipements">EQU</button>
+      <button onclick="navTo('sec-bogies')"        class="tri-btn" title="Bogies">BOG</button>
+      <button onclick="navTo('sec-tampons')"       class="tri-btn" title="Tampons">TAM</button>
+    </div>
     <button onclick="navTo('sec-opt')"           class="tri-btn" title="Options">OPT</button>
     <button id="btn-toggle-preview" onclick="togglePreview()" class="tri-btn" title="Aperçu on/off">APE</button>
     <span style="width:1px;background:rgba(255,255,255,0.2);align-self:stretch;margin:4px 2px;flex-shrink:0"></span>
     <button class="tri-btn vsw-nav active" data-v="wagon" onclick="switchVehicle('wagon')" style="flex:1.5" title="Wagon">WAG</button>
     <button class="tri-btn vsw-nav"        data-v="loco"  onclick="switchVehicle('loco')"  style="flex:1.5" title="Locomotive">LOC</button>
+    <button class="tri-btn vsw-nav"        data-v="marchandise"  onclick="switchVehicle('marchandise')"  style="flex:1.5" title="Loco marchandise (V100/V212)">MAR</button>
 </div>
 <div id="portrait-overlay" style="display:none;">
   <div class="rot-icon">📱</div>
@@ -769,6 +848,61 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
         <label>Épaisseur totale <span class="val" id="v-pareChocsEp">5</span> mm</label>
         <input type="range" id="pareChocsEp" min="1" max="30" value="5" step="0.5">
       </div>
+    </div>
+  </div>
+
+  <!-- LOCO MARCHANDISE (V100/V212) -->
+  <div class="section" id="sec-marchandise" style="display:none">
+    <div class="stitle">🚛 Loco marchandise (V100/V212)</div>
+    <div style="font-size:0.62rem;font-family:DM Mono,monospace;opacity:0.6;margin-bottom:6px">2 capots + cabine centrale surélevée</div>
+    <div class="field">
+      <label>Capot avant <span class="val" id="v-capotAvantL">60</span> mm</label>
+      <input type="range" id="capotAvantL" min="10" max="120" value="60" step="1">
+    </div>
+    <div class="field">
+      <label>Largeur cabine <span class="val" id="v-cabineMarPct">30</span> %</label>
+      <input type="range" id="cabineMarPct" min="10" max="60" value="30" step="1">
+    </div>
+    <div class="field">
+      <label>Capot arrière <span class="val" id="v-capotArriereL">40</span> mm</label>
+      <input type="range" id="capotArriereL" min="10" max="120" value="40" step="1">
+    </div>
+    <div class="field">
+      <label>Hauteur capots <span class="val" id="v-capotsH">30</span> mm</label>
+      <input type="range" id="capotsH" min="10" max="60" value="30" step="1">
+    </div>
+    <div style="font-size:0.65rem;font-weight:700;margin-top:10px;margin-bottom:4px">Grilles</div>
+    <div class="field">
+      <label class="ckrow"><input type="checkbox" id="showGrillesAvant"> Grilles face avant</label>
+    </div>
+    <div class="field">
+      <label class="ckrow"><input type="checkbox" id="showGrillesArriere"> Grilles face arrière</label>
+    </div>
+    <div class="field">
+      <label class="ckrow"><input type="checkbox" id="showGrillesCotes"> Grilles côtés capots</label>
+    </div>
+    <div class="field">
+      <label>Cellule grille L <span class="val" id="v-grilleMarCellW">6</span> mm</label>
+      <input type="range" id="grilleMarCellW" min="2" max="15" value="6" step="1">
+    </div>
+    <div class="field">
+      <label>Cellule grille H <span class="val" id="v-grilleMarCellH">4</span> mm</label>
+      <input type="range" id="grilleMarCellH" min="2" max="15" value="4" step="1">
+    </div>
+    <div class="field">
+      <label>Espacement <span class="val" id="v-grilleMarGap">2</span> mm</label>
+      <input type="range" id="grilleMarGap" min="1" max="8" value="2" step="1">
+    </div>
+    <div class="field">
+      <label>Marge bord <span class="val" id="v-grilleMarMarg">4</span> mm</label>
+      <input type="range" id="grilleMarMarg" min="1" max="15" value="4" step="1">
+    </div>
+    <div style="font-size:0.65rem;font-weight:700;margin-top:10px;margin-bottom:4px">Phares</div>
+    <div class="field">
+      <label class="ckrow"><input type="checkbox" id="showPharesAvant"> Phares avant</label>
+    </div>
+    <div class="field">
+      <label class="ckrow"><input type="checkbox" id="showPharesArriere"> Phares arrière</label>
     </div>
   </div>
 
@@ -1548,7 +1682,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <span style="font-size:0.67rem;font-family:DM Mono,monospace;opacity:0.7">Points :</span>
       <input type="range" id="biais-nb-pts" min="1" max="10" value="5" step="1" style="width:80px" oninput="biaisNbPtsChange(this.value)">
       <span id="biais-nb-pts-val" style="font-size:0.67rem;font-family:DM Mono,monospace;min-width:16px">5</span>
-      <label style="font-size:0.67rem;font-family:DM Mono,monospace;display:flex;align-items:center;gap:4px;cursor:pointer">
+      <label class="ckrow" style="margin-bottom:0">
         <input type="checkbox" id="biais-bezier" checked onchange="renderBiaisCanvas()">
         Bézier lisse
       </label>
@@ -1705,12 +1839,49 @@ const DEFAULT_LOCO  = {
   tab: 'patron'
 };
 
+const DEFAULT_MARCHANDISE = {
+  vehicle: 'marchandise',
+  longueur: 200, largeur: 60, hauteur: 50, epaisseur: 3,
+  toit: 'plat', segments: 4, toitHauteur: 15, coupoleEcras: 0,
+  // Spécifique loco marchandise (V100/V212)
+  capotAvantL: 60,        // longueur capot avant (mm)
+  capotArriereL: 40,      // longueur capot arrière (mm)
+  cabineMarPct: 30,       // largeur cabine en % de la longueur totale
+  capotsH: 30,            // hauteur des capots (mm)
+  showGrillesAvant: false,
+  showGrillesArriere: false,
+  showGrillesCotes: false,
+  grilleMarCellW: 6, grilleMarCellH: 4, grilleMarGap: 2, grilleMarMarg: 4,
+  // Phares
+  showPharesAvant: false, showPharesArriere: false,
+  nbPhares: 2, diamePhare: 8, phareY: 50, phareMarg: 4, phareForme: 'cercle',
+  phareDouble: false, phareEsp: 2, phareContour: false, phareContourEp: 2,
+  // Fenêtres cabine
+  nbFen: 2, wFen: 18, hFen: 14, yFen: 25, radiusFen: 2, fenSplit: false, fenContour: false, fenContourEp: 2,
+  // Tampons
+  showTampons: false, tamponNb: 2, tamponW: 12, tamponH: 12, tamponD: 8, tamponBiseaux: 0, tamponRadius: 2, tamponPosY: 80, tamponPos1X: 15, tamponPos2X: 40,
+  // Bogies
+  showBogies: false, bogieHauteur: 0, bogieEncoche: false, bogieEncW: 8, bogieEncH: 6, bogieEncBiseau: 0, bogiePos1: 20, bogiePos2: 80, bogieEncOffsetY: 0, showPiecesBogies: false,
+  // Relief
+  showRelief: false, reliefScale: 70, reliefOffsetY: 0,
+  // Marques / logo / cotes
+  showLogo: false, logoCompagnie: 'SNCF', logoNb: 1, logoPosX: 50, logoPosY: 75, logoW: 30,
+  nbMarques: 0, marquePosY1:25, marquePosY2:50, marquePosY3:75, marquePosY4:33, marquePosY5:66, marquePosY6:90,
+  showCotes: true, showFold: true, showFusionFlancs: false,
+  // Toit/coins
+  radiusToit: 5, radiusCoins: 5, radiusFondJonction: 3,
+  // Slider speed
+  sliderSpeed: 40, drawerWidth: 30,
+  tab: 'patron'
+};
+
 // Cloner un state
 function cloneState(src) { return Object.assign({}, src); }
 
 // States actifs
 let S_wagon = cloneState(DEFAULT_WAGON);
 let S_loco  = cloneState(DEFAULT_LOCO);
+let S_marchandise = cloneState(DEFAULT_MARCHANDISE);
 
 // S pointe vers le state actif
 let S = S_wagon;
@@ -1773,7 +1944,7 @@ sl('segments','segments'); sl('toitHauteur','toitHauteur'); sl('coupoleEcras','c
 sl('yFen','yFen'); sl('radiusFen','radiusFen'); sl('fenContourEp','fenContourEp'); for(let _w=1;_w<=3;_w++) sl('wPorte'+_w,'wPorte'+_w); sl('portePosX','portePosX'); sl('portePosX2','portePosX2'); sl('portePosX3','portePosX3'); sl('radiusPorte','radiusPorte');
 sl('porteMargH','porteMargH'); sl('porteMargB','porteMargB'); sl('mainsMY1','mainsMY1'); sl('mainsMEsp','mainsMEsp'); sl('mainsMMarg','mainsMMarg');
 for(let _p=1;_p<=3;_p++){sl('nbReliefPorte'+_p,'nbReliefPorte'+_p); sl('reliefPorteW'+_p,'reliefPorteW'+_p); sl('reliefPorteH'+_p,'reliefPorteH'+_p);} sl('reliefPorteGap','reliefPorteGap'); sl('reliefPorteOffsetY','reliefPorteOffsetY');
-sl('encocheFaceW','encocheFaceW'); sl('encocheFaceH','encocheFaceH'); sl('encocheFaceX','encocheFaceX'); sl('encocheFaceBiseau','encocheFaceBiseau'); sl('rtgInclin','rtgInclin'); sl('rtgArrondi','rtgArrondi'); sl('nezAngle','nezAngle'); sl('nezH','nezH'); sl('cabine','cabine'); sl('cabineArriere','cabineArriere'); sl('nezRadius','nezRadius'); sl('arretePliPos','arretePliPos'); sl('chasseW','chasseW'); sl('chasseH','chasseH'); sl('chasseBiseau','chasseBiseau'); sl('chasseNbLames','chasseNbLames'); sl('chasseLameH','chasseLameH'); sl('chasseSuppW','chasseSuppW'); sl('chasseSuppBiseau','chasseSuppBiseau'); sl('arretePliVal','arretePliVal'); sl('nezBiaisRainEsp','nezBiaisRainEsp'); sl('nezTurboArc','nezTurboArc'); sl('nezTurboIncl','nezTurboIncl'); sl('bombageSag','bombageSag'); sl('bombageEsp','bombageEsp'); sl('gabaritEp','gabaritEp'); sl('radiusCoinsNez','radiusCoinsNez'); sl('gabaritEpCoins','gabaritEpCoins'); sl('bogieEncW','bogieEncW'); sl('grilleX','grilleX'); sl('grilleY','grilleY'); sl('grilleW','grilleW'); sl('grilleH','grilleH'); sl('grilleCellW','grilleCellW'); sl('grilleCellH','grilleCellH'); sl('grilleCellR','grilleCellR'); sl('grilleGap','grilleGap'); sl('grilleR','grilleR'); sl('pareChocsEp','pareChocsEp');
+sl('encocheFaceW','encocheFaceW'); sl('encocheFaceH','encocheFaceH'); sl('encocheFaceX','encocheFaceX'); sl('encocheFaceBiseau','encocheFaceBiseau'); sl('rtgInclin','rtgInclin'); sl('rtgArrondi','rtgArrondi'); sl('nezAngle','nezAngle'); sl('nezH','nezH'); sl('cabine','cabine'); sl('cabineArriere','cabineArriere'); sl('nezRadius','nezRadius'); sl('arretePliPos','arretePliPos'); sl('chasseW','chasseW'); sl('chasseH','chasseH'); sl('chasseBiseau','chasseBiseau'); sl('chasseNbLames','chasseNbLames'); sl('chasseLameH','chasseLameH'); sl('chasseSuppW','chasseSuppW'); sl('chasseSuppBiseau','chasseSuppBiseau'); sl('arretePliVal','arretePliVal'); sl('nezBiaisRainEsp','nezBiaisRainEsp'); sl('nezTurboArc','nezTurboArc'); sl('nezTurboIncl','nezTurboIncl'); sl('bombageSag','bombageSag'); sl('bombageEsp','bombageEsp'); sl('gabaritEp','gabaritEp'); sl('radiusCoinsNez','radiusCoinsNez'); sl('gabaritEpCoins','gabaritEpCoins'); sl('bogieEncW','bogieEncW'); sl('grilleX','grilleX'); sl('grilleY','grilleY'); sl('grilleW','grilleW'); sl('grilleH','grilleH'); sl('grilleCellW','grilleCellW'); sl('grilleCellH','grilleCellH'); sl('grilleCellR','grilleCellR'); sl('grilleGap','grilleGap'); sl('grilleR','grilleR'); sl('pareChocsEp','pareChocsEp'); sl('capotAvantL','capotAvantL'); sl('capotArriereL','capotArriereL'); sl('cabineMarPct','cabineMarPct'); sl('capotsH','capotsH'); sl('grilleMarCellW','grilleMarCellW'); sl('grilleMarCellH','grilleMarCellH'); sl('grilleMarGap','grilleMarGap'); sl('grilleMarMarg','grilleMarMarg');
   ['A','B','C'].forEach(k => { ['Nb','X','L','W','H','BL','BW','R','GW','GH','GT','GM'].forEach(p => sl('equip'+k+p,'equip'+k+p)); }); sl('bogieEncH','bogieEncH'); sl('bogieHauteur','bogieHauteur'); sl('bogieEncBiseau','bogieEncBiseau'); sl('bogiePos1','bogiePos1'); sl('bogiePos2','bogiePos2'); sl('bogieEncOffsetY','bogieEncOffsetY'); sl('nezFaceAngle','nezFaceAngle'); sl('nezFaceAngle2','nezFaceAngle2'); sl('nezRTGAngle','nezRTGAngle'); sl('nezRTGArc','nezRTGArc'); sl('biseauJonctionH','biseauJonctionH');
 sl('reliefScale','reliefScale'); sl('reliefOffsetY','reliefOffsetY');
 sl('nbPhares','nbPhares'); sl('fenCabineW','fenCabineW'); sl('fenCabineContourEp','fenCabineContourEp'); sl('fenCabineH','fenCabineH'); sl('fenCabineR','fenCabineR'); sl('fenCabineY','fenCabineY'); sl('fenCabineMarg','fenCabineMarg'); sl('fenCabineRatio','fenCabineRatio'); sl('diamePhare','diamePhare'); sl('phareY','phareY'); sl('phareMarg','phareMarg'); sl('phareContourEp','phareContourEp'); sl('calePhareW','calePhareW'); sl('calePhareH','calePhareH'); sl('phareEsp','phareEsp');
@@ -1992,6 +2163,14 @@ document.getElementById('showPareChocs')?.addEventListener('change', e => {
   _el('pare-chocs-opts').style.display = e.target.checked ? 'block' : 'none';
   redraw();
 });
+
+// Marchandise checkboxes
+['showGrillesAvant', 'showGrillesArriere', 'showGrillesCotes', 'showPharesAvant', 'showPharesArriere'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', e => {
+    S[id] = e.target.checked;
+    redraw();
+  });
+});
 document.getElementById('showArretePli')?.addEventListener('change', e => {
   S.showArretePli = e.target.checked;
   _el('arrete-pli-opts').style.display = e.target.checked ? 'block' : 'none';
@@ -2121,32 +2300,28 @@ function switchVehicle(v) {
   if (v === S.vehicle) return; // déjà dans ce mode
 
   // ── Sauvegarder le state courant ──
-  if (S.vehicle === 'wagon') {
-    S_wagon = cloneState(S);
-  } else {
-    S_loco = cloneState(S);
-  }
+  if (S.vehicle === 'wagon')        S_wagon = cloneState(S);
+  else if (S.vehicle === 'loco')    S_loco  = cloneState(S);
+  else if (S.vehicle === 'marchandise') S_marchandise = cloneState(S);
 
   // ── Charger le nouveau state ──
-  S = (v === 'loco') ? S_loco : S_wagon;
+  if      (v === 'loco')         S = S_loco;
+  else if (v === 'marchandise')  S = S_marchandise;
+  else                            S = S_wagon;
   S.vehicle = v; // forcer le bon vehicle
 
-  // Highlight des boutons nav wagon/loco
-  const bw = document.getElementById('vsw-nav-wagon');
-  const bl = document.getElementById('vsw-nav-loco');
-  if (bw && bl) {
-    bw.style.background = v==='wagon' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.1)';
-    bw.style.border     = v==='wagon' ? '2px solid rgba(255,255,255,0.5)' : '1px solid rgba(255,255,255,0.2)';
-    bl.style.background = v==='loco'  ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.1)';
-    bl.style.border     = v==='loco'  ? '2px solid rgba(255,255,255,0.5)' : '1px solid rgba(255,255,255,0.2)';
-  }
   document.querySelectorAll('.vsw-nav').forEach(b => b.classList.toggle('active', b.dataset.v === v));
   document.querySelectorAll('.vsw').forEach(b => b.classList.toggle('active', b.dataset.v === v));
-  _el('section-loco').style.display    = v==='loco' ? 'block' : 'none';
-  _el('sec-encoche-face').style.display = v==='loco' ? 'block' : 'none';
-  _el('sec-chasse').style.display       = v==='loco' ? 'block' : 'none';
-  _el('sec-pare-chocs').style.display   = v==='loco' ? 'block' : 'none';
-  _el('sec-phares').style.display       = v==='loco' ? 'block' : 'none';
+  // Sections visibles selon le type
+  const isLoco = (v === 'loco');
+  const isMar  = (v === 'marchandise');
+  _el('section-loco').style.display     = isLoco ? 'block' : 'none';
+  _el('sec-encoche-face').style.display = isLoco ? 'block' : 'none';
+  _el('sec-chasse').style.display       = isLoco ? 'block' : 'none';
+  _el('sec-pare-chocs').style.display   = isLoco ? 'block' : 'none';
+  _el('sec-phares').style.display       = (isLoco || isMar) ? 'block' : 'none';
+  const secMar = _el('sec-marchandise');
+  if (secMar) secMar.style.display      = isMar ? 'block' : 'none';
   syncUIFromState();
   redraw();
 }
@@ -3462,6 +3637,11 @@ function drawPiecesBogies(px, py) {
   const bL    = S.longueur * 0.22;  // longueur bogie
   const bH    = bogieH;
   const ch    = wR * 0.4;  // chanfrein coins
+  const axW   = wR * 0.5;  // largeur encoche essieu
+  const axH   = wR * 0.4;  // hauteur encoche essieu
+  const tabW  = bL * 0.18; // largeur taquet bas
+  const tabH  = bH * 0.25; // hauteur taquet bas
+  const holeD = Math.max(2, wR * 0.18); // diamètre trous boulons
   let cx      = px;
 
   // ════════════════════════════════════════════════
@@ -5762,6 +5942,14 @@ function drawFusionFlancsToitPiece(px, py, isLoco) {
   drawFenetres(px, yFG, L, H);
   drawPortes(px, yFG, L, H);
   drawRainures(px, yFG, L, H);
+  drawBogieEncoches(px, yFG, L, H, false);
+
+  // ── Contenu flanc D (miroir : encoches du flanc D côté toit aussi) ──
+  // Le flanc D miroir est en haut, encoches sur son bord BAS (= bord opposé au toit en miroir)
+  // Comme le miroir inverse y, les encoches doivent être réorientées
+  draw = gMirror;
+  drawBogieEncoches(px, yFD, L, H, false);
+  draw = savedDraw;
 
   // ── Labels ──
   label(px+2, yFD+2, 'FLANC D (miroir)', 7);
@@ -5775,6 +5963,40 @@ function drawFusionFlancsToitPiece(px, py, isLoco) {
     cote(px-4, yToit, px-4, yFold2, Math.round(td*10)/10+'mm toit', -4);
   }
   return { w: L, h: totalH };
+}
+
+// Helper : dessine les encoches bogies sur un flanc (pour drawFlanc et drawFusionFlancsToitPiece)
+function drawBogieEncoches(px, py, W, H, mirror) {
+  if (!S.showBogies) return;
+  const Hf = H;
+  const bogieRX = [S.bogiePos1/100, S.bogiePos2/100];
+  bogieRX.forEach(rx => {
+    const bx = px + W * rx;
+    const by = py + H * 0.88;
+    draw.circle(5*SC).center(bx*SC, by*SC)
+      .fill('none').stroke({color:'#aaa', width:0.8, dasharray:'2 2'});
+    if (S.bogieEncoche) {
+      const ew = S.bogieEncW, eh = S.bogieEncH;
+      const ang = (S.bogieEncBiseau||0) * Math.PI / 180;
+      const bOffset = eh * Math.tan(ang);
+      // En miroir (flanc D fusionné), l'encoche est en HAUT de la pièce, pas en bas
+      // baseY = bord intérieur de la pièce (= bord du bas du flanc dans son orientation locale)
+      const baseY = mirror ? py - (S.bogieEncOffsetY||0) : py + Hf + (S.bogieEncOffsetY||0);
+      const ehSigned = mirror ? -eh : eh;
+      const x0 = bx - ew/2, x1 = bx + ew/2;
+      const xt0 = x0 + bOffset, xt1 = x1 - bOffset;
+      const path =
+        `M${x0*SC},${baseY*SC}` +
+        ` L${x1*SC},${baseY*SC}` +
+        ` L${xt1*SC},${(baseY-ehSigned)*SC}` +
+        ` L${xt0*SC},${(baseY-ehSigned)*SC}` +
+        ' Z';
+      draw.path(path).fill('white').stroke({color:CUT, width:1.4});
+      if (S.showCotes && !S._exportMode) {
+        cote(x0, baseY, x1, baseY, Math.round(ew*10)/10+'mm', mirror ? -3 : 3);
+      }
+    }
+  });
 }
 
 function drawFlanc(px, py, lbl, isLoco) {
@@ -5798,34 +6020,7 @@ function drawFlanc(px, py, lbl, isLoco) {
   }
   label(px+2, py+2, lbl, 7);
 
-  if (S.showBogies) {
-    const bogieRX = [S.bogiePos1/100, S.bogiePos2/100];
-    bogieRX.forEach(rx => {
-      const bx = px + W * rx;
-      const by = py + H * 0.88;
-      draw.circle(5*SC).center(bx*SC, by*SC)
-        .fill('none').stroke({color:'#aaa', width:0.8, dasharray:'2 2'});
-      if (S.bogieEncoche) {
-        const ew = S.bogieEncW, eh = S.bogieEncH;
-        const ang = (S.bogieEncBiseau||0) * Math.PI / 180;
-        const bOffset = eh * Math.tan(ang); // réduction haut due au biseau
-        const baseY = py + Hf + (S.bogieEncOffsetY||0);
-        // Trapèze : bas = ew (plein), haut = ew - 2*bOffset (réduit par biseaux)
-        const x0 = bx - ew/2, x1 = bx + ew/2;
-        const xt0 = x0 + bOffset, xt1 = x1 - bOffset;
-        const path =
-          `M${x0*SC},${baseY*SC}` +
-          ` L${x1*SC},${baseY*SC}` +
-          ` L${xt1*SC},${(baseY-eh)*SC}` +
-          ` L${xt0*SC},${(baseY-eh)*SC}` +
-          ' Z';
-        draw.path(path).fill('white').stroke({color:CUT, width:1.4});
-        if (S.showCotes && !S._exportMode) {
-          cote(x0, baseY, x1, baseY, Math.round(ew*10)/10+'mm', 3);
-        }
-      }
-    });
-  }
+  drawBogieEncoches(px, py, W, H, false);
 }
 
 // ═══════════════════════════════════════════════════
@@ -6070,9 +6265,246 @@ function drawFond(px, py, lbl) {
 }
 
 // ═══════════════════════════════════════════════════
+// PATRON LOCO MARCHANDISE (V100/V212)
+// Loco rectangulaire avec 2 capots (avant + arrière) et cabine centrale surélevée
+// ═══════════════════════════════════════════════════
+function drawPatronMarchandise() {
+  const ep      = S.epaisseur;
+  const L       = S.longueur;
+  const W       = S.largeur;
+  const H       = S.hauteur;
+  const Cav     = Math.min(S.capotAvantL || 60, L - 30);
+  const Car     = Math.min(S.capotArriereL || 40, L - Cav - 20);
+  const cabL    = L - Cav - Car;          // longueur cabine
+  const Hcap    = Math.min(S.capotsH || 30, H - 5);
+  const Hcab    = H;                       // cabine = pleine hauteur
+
+  const container = document.getElementById('svg-patron');
+  if (!container) return;
+  container.innerHTML = '';
+  // Largeur estimée : 2 flancs + plancher + toit + capots latéraux
+  const totalW = MARGIN + L*2 + W*2 + GAP*4 + MARGIN + 60;
+  const totalH = MARGIN + H*2 + W + GAP*4 + 200;
+  draw = SVG().addTo('#svg-patron').size(totalW * SC, totalH * SC);
+
+  if (S.showGrid) {
+    const gGrid = draw.group().attr({'pointer-events':'none'});
+    const gs = 5 * SC;
+    for (let x=0; x<=totalW*SC; x+=gs) gGrid.line(x,0,x,totalH*SC).stroke({color:'#ece8e0',width:0.4});
+    for (let y=0; y<=totalH*SC; y+=gs) gGrid.line(0,y,totalW*SC,y).stroke({color:'#ece8e0',width:0.4});
+  }
+
+  // ── Rangée 1 : Flancs G et D (silhouette avec capots + cabine) ──
+  const flancY = MARGIN;
+  const flancGX = MARGIN;
+  const flancDX = MARGIN + L + GAP;
+
+  function drawFlancMar(px, py, label_) {
+    // Bord supérieur en escalier : capot avant (Hcap) → cabine (Hcab) → capot arrière (Hcap)
+    const yCap_av = py + (H - Hcap);
+    const yCab    = py;
+    const yCap_ar = py + (H - Hcap);
+    const yBot    = py + H;
+
+    const path =
+      `M${px*SC},${yCap_av*SC}` +
+      ` L${(px+Cav)*SC},${yCap_av*SC}` +
+      ` L${(px+Cav)*SC},${yCab*SC}` +
+      ` L${(px+Cav+cabL)*SC},${yCab*SC}` +
+      ` L${(px+Cav+cabL)*SC},${yCap_ar*SC}` +
+      ` L${(px+L)*SC},${yCap_ar*SC}` +
+      ` L${(px+L)*SC},${yBot*SC}` +
+      ` L${px*SC},${yBot*SC} Z`;
+    draw.path(path).fill('none').stroke({color:CUT, width:1.5});
+    label(px+2, py+2, label_, 7);
+
+    // Marques de pli verticales aux jonctions capot/cabine (FOLD)
+    if (S.showFold) {
+      foldLine(px+Cav,      yCap_av, px+Cav,      yBot);
+      foldLine(px+Cav+cabL, yCap_ar, px+Cav+cabL, yBot);
+    }
+
+    // Fenêtres de cabine (zone cabine = entre Cav et Cav+cabL)
+    if (S.nbFen > 0) {
+      const margH = (S.fenSplit ? cabL/2 : cabL) * 0.05;
+      const wFen  = S.wFen || 18;
+      const hFen  = S.hFen || 14;
+      const yFenMm= py + H * (S.yFen || 25) / 100;
+      const totalFenW = wFen * S.nbFen + (S.nbFen - 1) * 6;
+      const startX = px + Cav + (cabL - totalFenW) / 2;
+      for (let i = 0; i < S.nbFen; i++) {
+        const fx = startX + i * (wFen + 6);
+        if (fx >= px + Cav && fx + wFen <= px + Cav + cabL) {
+          cutRect(fx, yFenMm, wFen, hFen, S.radiusFen || 2);
+        }
+      }
+    }
+
+    // Grilles côtés capots
+    if (S.showGrillesCotes) {
+      drawGrilleMarZone(px + 4, py + (H - Hcap) + 3, Cav - 8, Hcap - 6);
+      drawGrilleMarZone(px + Cav + cabL + 4, py + (H - Hcap) + 3, Car - 8, Hcap - 6);
+    }
+  }
+
+  drawFlancMar(flancGX, flancY, 'FLANC G');
+  drawFlancMar(flancDX, flancY, 'FLANC D');
+
+  if (S.showCotes) {
+    cote(flancGX, flancY - 4, flancGX + L, flancY - 4, L+'mm', -4);
+    cote(flancGX - 6, flancY, flancGX - 6, flancY + H, H+'mm cab', -4);
+    cote(flancGX, flancY + H + 4, flancGX + Cav, flancY + H + 4, Cav+'mm', 4);
+    cote(flancGX + Cav, flancY + H + 4, flancGX + Cav + cabL, flancY + H + 4, cabL+'mm', 4);
+    cote(flancGX + Cav + cabL, flancY + H + 4, flancGX + L, flancY + H + 4, Car+'mm', 4);
+  }
+
+  // ── Rangée 2 : Plancher + Toit + Faces (avant, arrière, cabine) ──
+  const r2y = flancY + H + GAP*3;
+
+  // Plancher (rectangle largeur × longueur)
+  const planchX = MARGIN;
+  const planchY = r2y;
+  rrect(planchX, planchY, L, W - 2*ep, 0, 'none', CUT, 1.5);
+  label(planchX+2, planchY+2, 'PLANCHER', 7);
+  if (S.showCotes) {
+    cote(planchX, planchY - 4, planchX + L, planchY - 4, L+'mm', -4);
+    cote(planchX - 6, planchY, planchX - 6, planchY + W - 2*ep, (W-2*ep)+'mm', -4);
+  }
+  // Marques de pli aux jonctions capot/cabine
+  if (S.showFold) {
+    foldLine(planchX + Cav,      planchY, planchX + Cav,      planchY + W - 2*ep);
+    foldLine(planchX + Cav+cabL, planchY, planchX + Cav+cabL, planchY + W - 2*ep);
+  }
+
+  // Toit (largeur × longueur, comme le plancher)
+  const toitX = planchX + L + GAP*2;
+  const toitY = r2y;
+  rrect(toitX, toitY, L, W - 2*ep, 0, 'none', CUT, 1.5);
+  label(toitX+2, toitY+2, 'TOIT', 7);
+  if (S.showFold) {
+    foldLine(toitX + Cav,      toitY, toitX + Cav,      toitY + W - 2*ep);
+    foldLine(toitX + Cav+cabL, toitY, toitX + Cav+cabL, toitY + W - 2*ep);
+  }
+
+  // ── Rangée 3 : Faces (avant + arrière + dessus capots avant/arrière + dessus cabine) ──
+  const r3y = r2y + (W - 2*ep) + GAP*3;
+  let r3x = MARGIN;
+
+  // Face avant (rectangle largeur × Hcap, avec grilles éventuelles + phares)
+  const faceAvW = W;
+  const faceAvH = Hcap;
+  rrect(r3x, r3y, faceAvW, faceAvH, 0, 'none', CUT, 1.5);
+  label(r3x+2, r3y+2, 'FACE AV', 7);
+  if (S.showGrillesAvant) {
+    drawGrilleMarZone(r3x + S.grilleMarMarg, r3y + S.grilleMarMarg,
+                      faceAvW - 2*S.grilleMarMarg, faceAvH - 2*S.grilleMarMarg);
+  }
+  if (S.showPharesAvant) {
+    drawPharesMarFace(r3x, r3y, faceAvW, faceAvH);
+  }
+  r3x += faceAvW + GAP*2;
+
+  // Face arrière (idem face avant)
+  const faceArW = W;
+  const faceArH = Hcap;
+  rrect(r3x, r3y, faceArW, faceArH, 0, 'none', CUT, 1.5);
+  label(r3x+2, r3y+2, 'FACE AR', 7);
+  if (S.showGrillesArriere) {
+    drawGrilleMarZone(r3x + S.grilleMarMarg, r3y + S.grilleMarMarg,
+                      faceArW - 2*S.grilleMarMarg, faceArH - 2*S.grilleMarMarg);
+  }
+  if (S.showPharesArriere) {
+    drawPharesMarFace(r3x, r3y, faceArW, faceArH);
+  }
+  r3x += faceArW + GAP*2;
+
+  // Dessus capot avant (Cav × W)
+  rrect(r3x, r3y, Cav, W - 2*ep, 0, 'none', CUT, 1.5);
+  label(r3x+2, r3y+2, 'DESSUS CAPOT AV', 7);
+  r3x += Cav + GAP*2;
+
+  // Dessus capot arrière (Car × W)
+  rrect(r3x, r3y, Car, W - 2*ep, 0, 'none', CUT, 1.5);
+  label(r3x+2, r3y+2, 'DESSUS CAPOT AR', 7);
+  r3x += Car + GAP*2;
+
+  // ── Rangée 4 : Cabine (4 faces dépliées : avant cabine + arrière cabine + dessus cabine) ──
+  const r4y = r3y + Math.max(faceAvH, W - 2*ep) + GAP*3;
+  let r4x = MARGIN;
+
+  // Faces verticales de la cabine (avant + arrière) — pleines hauteurs
+  rrect(r4x, r4y, W, H, 0, 'none', CUT, 1.5);
+  label(r4x+2, r4y+2, 'FACE AV CABINE', 7);
+  // Fenêtre cabine avant (1 fenêtre centrale)
+  if (S.nbFen > 0) {
+    const fw = (S.wFen || 18) * 1.5, fh = (S.hFen || 14);
+    const fx = r4x + (W - fw) / 2;
+    const fy = r4y + H * (S.yFen || 25) / 100;
+    cutRect(fx, fy, fw, fh, S.radiusFen || 2);
+  }
+  r4x += W + GAP*2;
+
+  rrect(r4x, r4y, W, H, 0, 'none', CUT, 1.5);
+  label(r4x+2, r4y+2, 'FACE AR CABINE', 7);
+  if (S.nbFen > 0) {
+    const fw = (S.wFen || 18) * 1.5, fh = (S.hFen || 14);
+    const fx = r4x + (W - fw) / 2;
+    const fy = r4y + H * (S.yFen || 25) / 100;
+    cutRect(fx, fy, fw, fh, S.radiusFen || 2);
+  }
+  r4x += W + GAP*2;
+
+  // Dessus cabine
+  rrect(r4x, r4y, cabL, W - 2*ep, 0, 'none', CUT, 1.5);
+  label(r4x+2, r4y+2, 'DESSUS CABINE', 7);
+}
+
+// Helper : dessine une grille de cellules dans une zone
+function drawGrilleMarZone(px, py, w, h) {
+  if (w < 5 || h < 5) return;
+  const cw = S.grilleMarCellW || 6;
+  const ch = S.grilleMarCellH || 4;
+  const gap = S.grilleMarGap || 2;
+  const nbCols = Math.floor((w + gap) / (cw + gap));
+  const nbRows = Math.floor((h + gap) / (ch + gap));
+  if (nbCols < 1 || nbRows < 1) return;
+  const usedW = nbCols * cw + (nbCols - 1) * gap;
+  const usedH = nbRows * ch + (nbRows - 1) * gap;
+  const offX = (w - usedW) / 2;
+  const offY = (h - usedH) / 2;
+  for (let r = 0; r < nbRows; r++) {
+    for (let c = 0; c < nbCols; c++) {
+      const x = px + offX + c * (cw + gap);
+      const y = py + offY + r * (ch + gap);
+      cutRect(x, y, cw, ch, 0.5);
+    }
+  }
+}
+
+// Helper : 2 phares sur une face (avant ou arrière)
+function drawPharesMarFace(px, py, w, h) {
+  const d = S.diamePhare || 8;
+  const my = py + h * (S.phareY || 50) / 100;
+  const margX = Math.max(S.phareMarg || 4, d/2 + 2);
+  const x1 = px + margX + d/2;
+  const x2 = px + w - margX - d/2;
+  if (S.phareForme === 'rect') {
+    cutRect(x1 - d/2, my - d/2, d, d, 1);
+    cutRect(x2 - d/2, my - d/2, d, d, 1);
+  } else {
+    draw.circle(d * SC).center(x1 * SC, my * SC).fill('none').stroke({color:CUT, width:1.4});
+    draw.circle(d * SC).center(x2 * SC, my * SC).fill('none').stroke({color:CUT, width:1.4});
+  }
+}
+
+// ═══════════════════════════════════════════════════
 // PATRON PRINCIPAL
 // ═══════════════════════════════════════════════════
 function drawPatron() {
+  // Dispatcher : mode marchandise = pipeline simplifié séparé
+  if (S.vehicle === 'marchandise') {
+    return drawPatronMarchandise();
+  }
   const isLoco = S.vehicle === 'loco';
   const td = toitDeplie();
   const th = toitHeight();
@@ -8023,9 +8455,10 @@ function saveConfig() {
   }
 
   const data = {
-    version: 2,
-    wagon: cleanState(S_wagon),
-    loco:  cleanState(S_loco)
+    version: 3,
+    wagon:        cleanState(S_wagon),
+    loco:         cleanState(S_loco),
+    marchandise: cleanState(S_marchandise)
   };
 
   const json = JSON.stringify(data, null, 2);
@@ -8053,17 +8486,22 @@ function loadConfig(event) {
           if (k in target && !k.startsWith('_')) target[k] = v;
       }
 
-      if (loaded.version === 2 && loaded.wagon && loaded.loco) {
-        // Format v2 : deux states indépendants
+      if ((loaded.version === 2 || loaded.version === 3) && loaded.wagon && loaded.loco) {
+        // Format v2/v3 : deux ou trois states indépendants
         mergeState(S_wagon, loaded.wagon);
         mergeState(S_loco,  loaded.loco);
+        if (loaded.marchandise) mergeState(S_marchandise, loaded.marchandise);
         // Restaurer le vehicle actif
-        S = (loaded.wagon.vehicle === 'loco' || S.vehicle === 'loco') ? S_loco : S_wagon;
+        const vWanted = S.vehicle;
+        if (vWanted === 'loco')              S = S_loco;
+        else if (vWanted === 'marchandise')  S = S_marchandise;
+        else                                  S = S_wagon;
       } else {
         // Format v1 (ancien) : un seul state → charger dans le mode courant
         mergeState(S, loaded);
-        if (S.vehicle === 'wagon') S_wagon = cloneState(S);
-        else S_loco = cloneState(S);
+        if (S.vehicle === 'wagon')              S_wagon = cloneState(S);
+        else if (S.vehicle === 'marchandise')   S_marchandise = cloneState(S);
+        else                                     S_loco = cloneState(S);
       }
 
       switchVehicle(S.vehicle || 'wagon');
@@ -8098,11 +8536,14 @@ function syncUIFromState() {
   initNezOpts();
   // Véhicule
   const isLoco = S.vehicle === 'loco';
+  const isMar  = S.vehicle === 'marchandise';
   _el('section-loco').style.display     = isLoco ? 'block' : 'none';
   _el('sec-encoche-face').style.display = isLoco ? 'block' : 'none';
   _el('sec-chasse').style.display       = isLoco ? 'block' : 'none';
   _el('sec-pare-chocs').style.display   = isLoco ? 'block' : 'none';
-  _el('sec-phares').style.display       = isLoco ? 'block' : 'none';
+  _el('sec-phares').style.display       = (isLoco || isMar) ? 'block' : 'none';
+  const _secMar = _el('sec-marchandise');
+  if (_secMar) _secMar.style.display    = isMar ? 'block' : 'none';
   // Relief
   _el('relief-opts').style.display = S.showRelief ? 'block' : 'none';
   _el('relief-portes-opts').style.display = S.showRelief ? 'block' : 'none';
@@ -9598,7 +10039,7 @@ window.addEventListener('resize', fixPanelHeight);</script>
 <!-- Input file hors modal pour compatibilité Android -->
 <input type="file" id="nez-img-input" accept="image/*" style="position:fixed;top:0;left:0;opacity:0.001;width:100%;height:1px;z-index:1" onchange="loadNezImage(event)">
 
-<div class="canvas-area" id="canvas-area" style="position:fixed;top:88px;left:320px;width:calc(100vw - 320px);height:calc(100vh - 88px);display:flex;flex-direction:column;overflow:hidden;background:#f5f0e8;">
+<div class="canvas-area" id="canvas-area">
   <canvas id="canvas-preview" style="display:none;max-width:100%;max-height:100%;"></canvas>
   <div class="canvas-wrap" id="canvas-wrap">
     <div class="canvas-inner" id="canvas-inner">
