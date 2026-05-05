@@ -374,7 +374,9 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
     top: 44px;
     bottom: 56px;
     left: 0;
-    width: 30%;
+    width: 60%;
+    max-width: 360px;
+    min-width: 260px;
     background: var(--panel);
     border-radius: 0 12px 12px 0;
     box-shadow: 4px 0 24px rgba(0,0,0,0.18);
@@ -428,7 +430,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
   font-weight: 700;
   font-size: 0.62rem;
   letter-spacing: 0.5px;
-  padding: 5px 8px;
+  padding: 5px 0;
   background: #d4b888;
   border: 1.5px solid #5a4a2a;
   border-radius: 4px;
@@ -436,11 +438,13 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
   cursor: pointer;
   text-align: center;
   line-height: 1;
-  min-width: 32px;
-  flex: 0 0 auto;
+  min-width: 0;
+  flex: 1 1 0;
   box-shadow: inset 0 -1px 0 rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.35);
 }
-.tri-group .tri-btn { flex: 1 1 auto; padding: 5px 0; }
+/* Groupes : flex pour partager l'espace proportionnellement au nombre de boutons */
+.tri-group { flex: var(--group-flex, 1) 1 0; min-width: 0; }
+.tri-group .tri-btn { flex: 1 1 0; }
 .tri-btn:hover { background: #e0c89a; }
 .tri-btn:active { background: #b89a6a; box-shadow: inset 0 1px 2px rgba(0,0,0,0.3); }
 .tri-btn.active { background: #f0b429; border-color: #6e4a0a; }
@@ -488,15 +492,16 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
 <div id="panel-nav">
     <div style="width:1px;background:rgba(255,255,255,0.2);align-self:stretch;margin:0 2px"></div>
 </span>
-    <div class="tri-group" data-label="Bases">
+    <div class="tri-group" data-label="Bases" style="--group-flex:7">
       <button onclick="navTo('sec-dims')"         class="tri-btn" title="Dimensions">DIM</button>
       <button onclick="navTo('sec-toit')"          class="tri-btn" title="Toit">TOI</button>
       <button onclick="navTo('section-loco')"      class="tri-btn" title="Nez">NEZ</button>
       <button onclick="navTo('sec-fen')"           class="tri-btn" title="Fenêtres">FEN</button>
       <button onclick="navTo('sec-porte')"         class="tri-btn" title="Portes">POR</button>
       <button onclick="navTo('sec-phares')"        class="tri-btn" title="Phares">PHA</button>
+      <button onclick="navTo('sec-marchandise')"   class="tri-btn" id="btn-nav-mar" title="Loco marchandise" style="display:none">CAB</button>
     </div>
-    <div class="tri-group" data-label="Ornements">
+    <div class="tri-group" data-label="Ornements" style="--group-flex:7">
       <button onclick="navTo('sec-encoche-face')"  class="tri-btn" title="Encoche face">ENC</button>
       <button onclick="navTo('sec-relief')"        class="tri-btn" title="Relief">REL</button>
       <button onclick="navTo('sec-rain')"          class="tri-btn" title="Rainures">RAI</button>
@@ -505,20 +510,20 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <button onclick="navTo('sec-logo')"          class="tri-btn" title="Logo">LOG</button>
       <button onclick="navTo('sec-grille')"        class="tri-btn" title="Grille">GRI</button>
     </div>
-    <div class="tri-group" data-label="Equipements">
+    <div class="tri-group" data-label="Equipements" style="--group-flex:5">
       <button onclick="navTo('sec-pare-chocs')"    class="tri-btn" title="Pare-chocs">PCH</button>
       <button onclick="navTo('sec-chasse')"        class="tri-btn" title="Chasse-pierre">CHP</button>
       <button onclick="navTo('sec-equip')"         class="tri-btn" title="Équipements">EQU</button>
       <button onclick="navTo('sec-bogies')"        class="tri-btn" title="Bogies">BOG</button>
       <button onclick="navTo('sec-tampons')"       class="tri-btn" title="Tampons">TAM</button>
     </div>
-    <button onclick="navTo('sec-opt')"           class="tri-btn" title="Options" style="flex:0 0 auto">OPT</button>
-    <button id="btn-toggle-preview" onclick="togglePreview()" class="tri-btn" title="Aperçu on/off" style="flex:0 0 auto">APE</button>
+    <button onclick="navTo('sec-opt')"           class="tri-btn" title="Options">OPT</button>
+    <button id="btn-toggle-preview" onclick="togglePreview()" class="tri-btn" title="Aperçu on/off">APE</button>
     <span style="width:1px;background:rgba(255,255,255,0.2);align-self:stretch;margin:4px 2px;flex-shrink:0"></span>
-    <div class="tri-group" data-label="Type de train">
-      <button class="tri-btn vsw-nav active" data-v="wagon" onclick="switchVehicle('wagon')" style="flex:0 0 auto" title="Wagon">WAG</button>
-      <button class="tri-btn vsw-nav"        data-v="loco"  onclick="switchVehicle('loco')"  style="flex:0 0 auto" title="Locomotive">LOC</button>
-      <button class="tri-btn vsw-nav"        data-v="marchandise"  onclick="switchVehicle('marchandise')"  style="flex:0 0 auto" title="Loco marchandise (V100/V212)">MAR</button>
+    <div class="tri-group" data-label="Type de train" style="--group-flex:3">
+      <button class="tri-btn vsw-nav active" data-v="wagon" onclick="switchVehicle('wagon')" title="Wagon">WAG</button>
+      <button class="tri-btn vsw-nav"        data-v="loco"  onclick="switchVehicle('loco')"  title="Locomotive">LOC</button>
+      <button class="tri-btn vsw-nav"        data-v="marchandise"  onclick="switchVehicle('marchandise')"  title="Loco marchandise (V100/V212)">MAR</button>
     </div>
 </div>
 <div id="portrait-overlay" style="display:none;">
@@ -550,6 +555,14 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
     <div class="field">
       <label>Épaisseur carton <span class="val" id="v-epaisseur">3</span> mm</label>
       <input type="range" id="epaisseur" min="1" max="6" value="3" step="0.5">
+    </div>
+    <div class="field" id="f-cabineCentraleL" style="display:none">
+      <label>Longueur cabine centrale <span class="val" id="v-cabineCentraleL">60</span> mm</label>
+      <input type="range" id="cabineCentraleL" min="20" max="200" value="60" step="2">
+    </div>
+    <div class="field" id="f-cabineCentraleX" style="display:none">
+      <label>Position cabine centrale <span class="val" id="v-cabineCentraleX">50</span> %</label>
+      <input type="range" id="cabineCentraleX" min="0" max="100" value="50" step="1">
     </div>
   </div>
 
@@ -665,7 +678,6 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
     <div class="field" id="f-nezRadius" style="display:none">
       <label>Radius angles nez <span class="val" id="v-nezRadius">0</span> mm</label>
       <input type="range" id="nezRadius" min="0" max="30" value="0" step="0.5">
-    </div
     </div>
     <div id="nez-casse-opts">
     <!-- Préréglages courbe nez -->
@@ -733,7 +745,6 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
         <input type="range" id="nezTurboIncl" min="0" max="100" value="20" step="1">
       </div>
     </div>
-    </div><!-- /nez-casse-opts -->
     <div class="field" id="f-bombage" style="display:none">
       <label class="ckrow"><input type="checkbox" id="showBombage"> Bombage face avant (Nez EAD)</label>
     </div>
@@ -880,16 +891,74 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <input type="range" id="capotAvantL" min="10" max="120" value="60" step="1">
     </div>
     <div class="field">
-      <label>Largeur cabine <span class="val" id="v-cabineMarPct">30</span> %</label>
-      <input type="range" id="cabineMarPct" min="10" max="60" value="30" step="1">
-    </div>
-    <div class="field">
       <label>Capot arrière <span class="val" id="v-capotArriereL">40</span> mm</label>
       <input type="range" id="capotArriereL" min="10" max="120" value="40" step="1">
     </div>
     <div class="field">
       <label>Hauteur capots <span class="val" id="v-capotsH">30</span> mm</label>
       <input type="range" id="capotsH" min="10" max="60" value="30" step="1">
+    </div>
+    <div class="field">
+      <label class="ckrow"><input type="checkbox" id="plancherAvantReduit"> Plancher avant rétréci (encoche U)</label>
+    </div>
+    <div class="field" id="f-plancherAvantPct" style="display:none">
+      <label>Largeur plancher avant <span class="val" id="v-plancherAvantPct">60</span> %</label>
+      <input type="range" id="plancherAvantPct" min="20" max="100" value="60" step="5">
+    </div>
+    <div class="field" id="f-plancherAvantBis" style="display:none">
+      <label>Biseau angles plancher <span class="val" id="v-plancherAvantBis">0</span> mm</label>
+      <input type="range" id="plancherAvantBis" min="0" max="20" value="0" step="0.5">
+    </div>
+    <div class="field">
+      <label>Largeur cabine <span class="val" id="v-cabineLargeur">70</span> mm</label>
+      <input type="range" id="cabineLargeur" min="20" max="150" value="70" step="1">
+    </div>
+    <div class="field">
+      <label>Hauteur cabine <span class="val" id="v-cabineHauteur">25</span> mm</label>
+      <input type="range" id="cabineHauteur" min="10" max="80" value="25" step="1">
+    </div>
+    <div class="field">
+      <label>Forme haut cabine</label>
+      <select id="cabineHautForme" style="width:100%;font-family:DM Mono,monospace;font-size:0.7rem;padding:5px;background:#f0ece3;border:1px solid #c8bfaa;border-radius:4px">
+        <option value="plat">Plat</option>
+        <option value="arrondis">Coins arrondis</option>
+        <option value="biseaux">Coins biseautés</option>
+        <option value="arc">Arc continu (sagitta)</option>
+      </select>
+    </div>
+    <div class="field" id="f-cabineHautR" style="display:none">
+      <label>Rayon arrondis <span class="val" id="v-cabineHautR">8</span> mm</label>
+      <input type="range" id="cabineHautR" min="0" max="30" value="8" step="1">
+    </div>
+    <div class="field" id="f-cabineHautB" style="display:none">
+      <label>Profondeur biseau <span class="val" id="v-cabineHautB">8</span> mm</label>
+      <input type="range" id="cabineHautB" min="0" max="30" value="8" step="1">
+    </div>
+    <div class="field" id="f-cabineHautArc" style="display:none">
+      <label>Sagitta arc <span class="val" id="v-cabineHautArc">10</span> mm</label>
+      <input type="range" id="cabineHautArc" min="0" max="30" value="10" step="1">
+    </div>
+    <div class="field">
+      <label>Débord dessus cabine <span class="val" id="v-cabineDessusDebord">5</span> mm</label>
+      <input type="range" id="cabineDessusDebord" min="0" max="20" value="5" step="1">
+    </div>
+    <div style="font-size:0.65rem;font-weight:700;margin-top:10px;margin-bottom:4px">Cabine débordante (style V100)</div>
+    <div class="field">
+      <label class="ckrow">Activer débordement<input type="checkbox" id="showCabineDebord"></label>
+    </div>
+    <div id="cabine-debord-opts" style="display:none">
+      <div class="field">
+        <label>Largeur cabine <span class="val" id="v-cabineDebordW">70</span> mm</label>
+        <input type="range" id="cabineDebordW" min="40" max="120" value="70" step="1">
+      </div>
+      <div class="field">
+        <label>Hauteur débord <span class="val" id="v-cabineDebordH">15</span> mm</label>
+        <input type="range" id="cabineDebordH" min="3" max="40" value="15" step="1">
+      </div>
+      <div class="field">
+        <label>Profondeur biseau haut <span class="val" id="v-cabineDebordBiseau">0</span> mm</label>
+        <input type="range" id="cabineDebordBiseau" min="0" max="20" value="0" step="1">
+      </div>
     </div>
     <div style="font-size:0.65rem;font-weight:700;margin-top:10px;margin-bottom:4px">Grilles</div>
     <div class="field">
@@ -950,6 +1019,23 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <input type="range" id="radiusFen" min="0" max="10" value="3" step="0.5">
     </div>
     <div class="field">
+      <label class="ckrow">Mode étage (2e niveau de fenêtres)<input type="checkbox" id="fenEtage"></label>
+    </div>
+    <div id="fen-etage-opts" style="display:none">
+      <div class="field">
+        <label>Position verticale étage 2 <span class="val" id="v-yFen2">60</span>%</label>
+        <input type="range" id="yFen2" min="5" max="90" value="60" step="5">
+      </div>
+      <div class="field">
+        <label>Hauteur fenêtre étage 2 <span class="val" id="v-hFen2">12</span> mm</label>
+        <input type="range" id="hFen2" min="5" max="50" value="12" step="1">
+      </div>
+      <div class="field">
+        <label>Décalage X étage 2 <span class="val" id="v-xFen2">50</span>%</label>
+        <input type="range" id="xFen2" min="0" max="100" value="50" step="5">
+      </div>
+    </div>
+    <div class="field">
       <label class="ckrow"><input type="checkbox" id="fenSplit"> Fenêtre séparée en 2 (double vitrage)</label>
     </div>
     <div class="field">
@@ -1008,6 +1094,23 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <div class="field" id="f-fenCabineContourEp" style="display:none">
         <label>Épaisseur contour <span class="val" id="v-fenCabineContourEp">2</span> mm</label>
         <input type="range" id="fenCabineContourEp" min="0.5" max="8" value="2" step="0.5">
+      </div>
+      <div class="field" style="margin-top:8px">
+        <label class="ckrow"><input type="checkbox" id="showAuvent"> Auvent fenêtres (pièces séparées)</label>
+      </div>
+      <div id="auvent-opts" style="display:none">
+        <div class="field">
+          <label>Hauteur auvent <span class="val" id="v-auventH">5</span> mm</label>
+          <input type="range" id="auventH" min="2" max="20" value="5" step="0.5">
+        </div>
+        <div class="field">
+          <label>Largeur (% périmètre) <span class="val" id="v-auventRatio">75</span> %</label>
+          <input type="range" id="auventRatio" min="30" max="100" value="75" step="5">
+        </div>
+        <div class="field">
+          <label>Profondeur biseau <span class="val" id="v-auventBiseau">0</span> mm</label>
+          <input type="range" id="auventBiseau" min="0" max="10" value="0" step="0.5">
+        </div>
       </div>
     </div>
   </div>
@@ -1154,7 +1257,14 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
         <input type="range" id="phareMarg" min="1" max="20" value="4" step="1">
       </div>
       <div class="field">
-        <label class="ckrow"><input type="checkbox" id="phareDouble"> Double (2 phares côte à côte)</label>
+        <label class="ckrow"><input type="checkbox" id="phareDouble"> Double (2 phares groupés)</label>
+      </div>
+      <div class="field" id="f-phareDoubleOrient" style="display:none">
+        <label>Orientation double</label>
+        <select id="phareDoubleOrient" style="width:100%;font-family:DM Mono,monospace;font-size:0.7rem;padding:5px;background:#f0ece3;border:1px solid #c8bfaa;border-radius:4px">
+          <option value="horizontal">Horizontale (côte à côte)</option>
+          <option value="vertical">Verticale (l'un au-dessus de l'autre)</option>
+        </select>
       </div>
       <div class="field" id="f-phareEsp" style="display:none">
         <label>Espacement double <span class="val" id="v-phareEsp">2</span> mm</label>
@@ -1617,8 +1727,8 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
     <label class="ckrow"><input type="checkbox" id="showCotes" checked> Afficher les cotes</label>
     <label class="ckrow"><input type="checkbox" id="showFusionFlancs"> Pièce fusionnée flancs+toit</label>
     <div class="field" id="f-drawerWidth">
-      <label>Largeur drawer mobile <span class="val" id="v-drawerWidth">30</span>%</label>
-      <input type="range" id="drawerWidth" min="20" max="60" value="30" step="5">
+      <label>Largeur drawer mobile <span class="val" id="v-drawerWidth">60</span>%</label>
+      <input type="range" id="drawerWidth" min="30" max="90" value="60" step="5">
     </div>
     <div class="field" style="margin-top:8px">
       <label>Sensibilité sliders mobile <span class="val" id="v-sliderSpeed">40</span>%</label>
@@ -1634,8 +1744,12 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <label class="ckrow"><input type="checkbox" id="bogieEncoche"> Encoches sur flancs</label>
       <div id="bogie-enc-opts" style="display:none">
         <div class="field">
-          <label>Largeur encoche <span class="val" id="v-bogieEncW">8</span> mm</label>
+          <label>Largeur encoche 1 <span class="val" id="v-bogieEncW">8</span> mm</label>
           <input type="range" id="bogieEncW" min="2" max="60" value="8" step="0.5">
+        </div>
+        <div class="field">
+          <label>Largeur encoche 2 <span class="val" id="v-bogieEncW2">8</span> mm</label>
+          <input type="range" id="bogieEncW2" min="2" max="60" value="8" step="0.5">
         </div>
         <div class="field">
           <label>Hauteur encoche <span class="val" id="v-bogieEncH">6</span> mm</label>
@@ -1698,27 +1812,27 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <button onclick="closeBiaisEditor()" style="margin-left:auto;background:none;border:none;color:#f0ece3;font-size:1.3rem;cursor:pointer;padding:0 6px;line-height:1">✕</button>
     </div>
 
-    <div style="background:#e8e2d6;border-bottom:1px solid #c8bfaa;padding:7px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0">
-      <span style="font-size:0.67rem;font-family:DM Mono,monospace;opacity:0.7">Points :</span>
-      <input type="range" id="biais-nb-pts" min="1" max="10" value="5" step="1" style="width:80px" oninput="biaisNbPtsChange(this.value)">
-      <span id="biais-nb-pts-val" style="font-size:0.67rem;font-family:DM Mono,monospace;min-width:16px">5</span>
-      <label class="ckrow" style="margin-bottom:0">
+    <div style="background:#e8e2d6;border-bottom:1px solid #c8bfaa;padding:6px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex-shrink:0">
+      <span style="font-size:0.65rem;font-family:DM Mono,monospace;opacity:0.7">Pts</span>
+      <input type="range" id="biais-nb-pts" min="1" max="10" value="5" step="1" style="width:60px;flex-shrink:0" oninput="biaisNbPtsChange(this.value)">
+      <span id="biais-nb-pts-val" style="font-size:0.65rem;font-family:DM Mono,monospace;min-width:14px">5</span>
+      <label class="ckrow" style="margin-bottom:0;font-size:0.65rem">
         <input type="checkbox" id="biais-bezier" checked onchange="renderBiaisCanvas()">
-        Bézier lisse
+        Bézier
       </label>
-      <button onclick="resetBiaisProfile()" style="font-family:DM Mono,monospace;font-size:0.68rem;padding:5px 10px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">⊙ Réinitialiser</button>
-      <span style="font-size:0.67rem;font-family:DM Mono,monospace;opacity:0.7">Arrondi pointe :</span>
-      <input type="range" id="biais-tip-radius" min="0" max="100" value="0" step="5" style="width:70px" oninput="biaisTipRadiusChange(this.value)">
-      <span id="biais-tip-radius-val" style="font-size:0.67rem;font-family:DM Mono,monospace;min-width:20px">0%</span>
-      <button onclick="applyBiaisProfile()" style="font-family:Syne,sans-serif;font-weight:700;font-size:0.8rem;padding:6px 16px;background:#c94a1e;color:white;border:none;border-radius:6px;cursor:pointer;margin-left:auto">✓ Appliquer</button>
+      <button onclick="resetBiaisProfile()" style="font-family:DM Mono,monospace;font-size:0.65rem;padding:4px 8px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">⊙ Reset</button>
+      <span style="font-size:0.65rem;font-family:DM Mono,monospace;opacity:0.7">Pointe</span>
+      <input type="range" id="biais-tip-radius" min="0" max="100" value="0" step="5" style="width:55px;flex-shrink:0" oninput="biaisTipRadiusChange(this.value)">
+      <span id="biais-tip-radius-val" style="font-size:0.65rem;font-family:DM Mono,monospace;min-width:18px">0%</span>
+      <button onclick="applyBiaisProfile()" style="font-family:Syne,sans-serif;font-weight:700;font-size:0.78rem;padding:5px 14px;background:#c94a1e;color:white;border:none;border-radius:5px;cursor:pointer;margin-left:auto;flex-shrink:0">✓ OK</button>
     </div>
 
     <div id="biais-validation" style="background:#fff3cd;border-bottom:1px solid #c8bfaa;padding:4px 12px;font-size:0.61rem;font-family:DM Mono,monospace;display:none;color:#856404;flex-shrink:0">
       ⚠ <span id="biais-validation-msg"></span>
     </div>
 
-    <div style="background:#ede8dc;padding:4px 12px;font-size:0.61rem;font-family:DM Mono,monospace;opacity:0.75;flex-shrink:0">
-      👆 Faites glisser les points • Axe horizontal = largeur wagon (flanc→flanc) • Axe vertical = profondeur du biais • Partie droite = miroir automatique
+    <div style="background:#ede8dc;padding:3px 10px;font-size:0.58rem;font-family:DM Mono,monospace;opacity:0.65;flex-shrink:0">
+      👆 Glissez les points • Horizontal = largeur • Vertical = profondeur biais • Droite = miroir auto
     </div>
 
     <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff9f4;padding:12px">
@@ -1735,26 +1849,20 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <button onclick="closeNezEditor()" style="margin-left:auto;background:none;border:none;color:#f0ece3;font-size:1.3rem;cursor:pointer;padding:0 6px;line-height:1">✕</button>
     </div>
 
-    <!-- Toolbar ligne 1 : image -->
-    <div style="background:#e8e2d6;border-bottom:1px solid #c8bfaa;padding:7px 12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex-shrink:0">
-      <label style="font-size:0.68rem;font-family:DM Mono,monospace;opacity:0.7;flex-shrink:0">🖼 Référence :</label>
-      <!-- Input file classique masqué, bouton custom pour mobile -->
-      <label for="nez-img-input" style="font-family:DM Mono,monospace;font-size:0.72rem;padding:6px 12px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer;display:inline-block;user-select:none;-webkit-tap-highlight-color:transparent">📂 Choisir image</label>
-      <button id="btn-img-move" onclick="toggleImgMode()" style="font-family:DM Mono,monospace;font-size:0.72rem;padding:6px 10px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer" title="Déplacer l'image">🖐 Déplacer img</button>
-      <button onclick="nezImgScale(1.2)" style="font-family:DM Mono,monospace;font-size:0.72rem;padding:6px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">🔍＋</button>
-      <button onclick="nezImgScale(0.83)" style="font-family:DM Mono,monospace;font-size:0.72rem;padding:6px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">🔍－</button>
-      <button onclick="nezImgReset()" style="font-family:DM Mono,monospace;font-size:0.65rem;padding:6px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">⊙img</button>
-    </div>
-
-    <!-- Toolbar ligne 2 : zoom + actions -->
-    <div style="background:#e8e2d6;border-bottom:1px solid #c8bfaa;padding:7px 12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex-shrink:0">
-      <span style="font-size:0.65rem;opacity:0.6;font-family:DM Mono,monospace">Zoom :</span>
-      <button onclick="nezZoomIn()" style="font-family:DM Mono,monospace;font-size:0.85rem;padding:6px 11px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">＋</button>
-      <button onclick="nezZoomOut()" style="font-family:DM Mono,monospace;font-size:0.85rem;padding:6px 11px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">－</button>
-      <button onclick="nezZoomReset()" style="font-family:DM Mono,monospace;font-size:0.7rem;padding:6px 11px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">⊙</button>
-      <button onclick="nezUndo()" style="font-family:DM Mono,monospace;font-size:0.7rem;padding:6px 11px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">↩ Annuler</button>
-      <button onclick="nezClear()" style="font-family:DM Mono,monospace;font-size:0.7rem;padding:6px 11px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:6px;cursor:pointer">🗑 Effacer</button>
-      <button onclick="applyNezCustom()" style="font-family:Syne,sans-serif;font-weight:700;font-size:0.8rem;padding:6px 16px;background:#c94a1e;color:white;border:none;border-radius:6px;cursor:pointer;margin-left:auto">✓ Appliquer</button>
+    <!-- Toolbar unique : image + zoom + actions -->
+    <div style="background:#e8e2d6;border-bottom:1px solid #c8bfaa;padding:6px 10px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;flex-shrink:0">
+      <label for="nez-img-input" style="font-family:DM Mono,monospace;font-size:0.66rem;padding:5px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer;display:inline-block;user-select:none;-webkit-tap-highlight-color:transparent" title="Choisir image de référence">📂</label>
+      <button id="btn-img-move" onclick="toggleImgMode()" style="font-family:DM Mono,monospace;font-size:0.66rem;padding:5px 8px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Déplacer l'image">🖐</button>
+      <button onclick="nezImgScale(1.2)" style="font-family:DM Mono,monospace;font-size:0.66rem;padding:5px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Agrandir image">🔍＋</button>
+      <button onclick="nezImgScale(0.83)" style="font-family:DM Mono,monospace;font-size:0.66rem;padding:5px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Réduire image">🔍－</button>
+      <button onclick="nezImgReset()" style="font-family:DM Mono,monospace;font-size:0.6rem;padding:5px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Reset image">⊙</button>
+      <span style="width:1px;height:20px;background:#c8bfaa;margin:0 2px"></span>
+      <button onclick="nezZoomIn()" style="font-family:DM Mono,monospace;font-size:0.78rem;padding:5px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Zoom +">＋</button>
+      <button onclick="nezZoomOut()" style="font-family:DM Mono,monospace;font-size:0.78rem;padding:5px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Zoom -">－</button>
+      <button onclick="nezZoomReset()" style="font-family:DM Mono,monospace;font-size:0.62rem;padding:5px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Reset zoom">⊙</button>
+      <button onclick="nezUndo()" style="font-family:DM Mono,monospace;font-size:0.65rem;padding:5px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Annuler">↩</button>
+      <button onclick="nezClear()" style="font-family:DM Mono,monospace;font-size:0.65rem;padding:5px 9px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer" title="Effacer">🗑</button>
+      <button onclick="applyNezCustom()" style="font-family:Syne,sans-serif;font-weight:700;font-size:0.78rem;padding:5px 14px;background:#c94a1e;color:white;border:none;border-radius:5px;cursor:pointer;margin-left:auto;flex-shrink:0">✓ OK</button>
     </div>
 
     <!-- Hint -->
@@ -1816,13 +1924,13 @@ const DEFAULT_WAGON = {
   vehicle: 'wagon',
   longueur: 200, largeur: 60, hauteur: 50, epaisseur: 3,
   toit: 'plat', segments: 4, toitHauteur: 15, coupoleEcras: 0,
-  nbFen: 4, wFen: 22, hFen: 16, yFen: 30, radiusFen: 3, fenSplit: false, fenContour: false, fenContourEp: 2,
+  nbFen: 4, wFen: 22, hFen: 16, yFen: 30, radiusFen: 3, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenContour: false, fenContourEp: 2,
   nbPortes: 0, wPorte1:18, wPorte2:18, wPorte3:18, radiusPorte: 2, portePosX: 25, portePosX2: 75, portePosX3: 50, porteDouble: false,
   porteMargH: 2, porteMargB: 2, showMainsMontoires: false, mainsMY1: 30, mainsMEsp: 15, mainsMMarg: 4, nbReliefPorte1:1, nbReliefPorte2:1, nbReliefPorte3:1, reliefPorteW1:14, reliefPorteH1:20, reliefPorteW2:14, reliefPorteH2:20, reliefPorteW3:14, reliefPorteH3:20, reliefPorteGap: 4, reliefPorteOffsetY: 0,
   nez: 'casse', rtgInclin: 30, rtgArrondi: 20, nezAngle: 30, nezH: 60, cabine: 25, cabineArriere: 25, showBombage: false, bombageSag: 5, bombageEsp: 5, showGabarit: false, showGabaritCoins: false, gabaritEp: 20, showRadiusCoinsNez: false, coinsNezType: 'none', radiusCoinsNez: 8, gabaritEpCoins: 20, nezRadius: 0, nezBiaisProfilePts: [], nezBiaisNbPoints: 5, nezBiaisBezier: true, nezBiaisRainEsp: 5, nezBiaisTipRadius: 0, nezFaceType: 'plat', nezFaceAngle: 20, nezFaceAngle2: 20, nezRTGAngle: 20, nezRTGArc: 30, showBiseauJonction: false, biseauJonctionH: 5, nezTurboArc: 10, nezTurboIncl: 20, nezSymetrie: false, showEncocheFace: false, encocheFaceW: 30, encocheFaceH: 10, encocheFaceX: 50, encocheFaceBiseau: 0, showPareChocs: false, pareChocsEp: 5, showChassePierre: false, chasseW: 60, chasseH: 30, chasseBiseau: 15, chasseNbLames: 4, chasseLameH: 3, chasseSuppW: 20, chasseSuppBiseau: 15, showArretePli: false, arretePliPos: 30, arretePliVal: 5, showCourbeBasNez: false, arretePliDir: 'haut',
   radiusToit: 5, radiusCoins: 5, radiusFondJonction: 3, rJonctionToitNez: 8, rJonctionToitNez: 8,
   showRelief: false, reliefScale: 70, reliefOffsetY: 0,
-  showPhares: false, showCalePhare: false, showFenCabine: false, fenCabineToitEpouse: false, fenCabineContour: false, fenCabineRatio: 50, fenCabineContourEp: 2, fenCabineForme: 'rect', fenCabineW: 12, fenCabineH: 10, fenCabineR: 2, fenCabineY: 30, fenCabineMarg: 5, calePhareW: 12, calePhareH: 1, nbPhares: 2, diamePhare: 8, phareY: 25, phareMarg: 4, phareForme: 'cercle', phareDouble: false, phareEsp: 2, phareContour: false, phareContourEp: 2,
+  showPhares: false, showCalePhare: false, showFenCabine: false, fenCabineToitEpouse: false, fenCabineContour: false, fenCabineRatio: 50, fenCabineContourEp: 2, showAuvent: false, auventH: 5, auventRatio: 75, auventBiseau: 0, fenCabineForme: 'rect', fenCabineW: 12, fenCabineH: 10, fenCabineR: 2, fenCabineY: 30, fenCabineMarg: 5, calePhareW: 12, calePhareH: 1, nbPhares: 2, diamePhare: 8, phareY: 25, phareMarg: 4, phareForme: 'cercle', phareDouble: false, phareDoubleOrient: 'horizontal', phareEsp: 2, phareContour: false, phareContourEp: 2,
   showCouloir: false, couloirW: 55, couloirH: 45, couloirD: 20, couloirNbPlis: 4, couloirEp: 6,
   showTampons: false, tamponNb: 2, tamponW: 12, tamponH: 12, tamponD: 8, tamponBiseaux: 0, tamponRadius: 2, tamponPosY: 80, tamponPos1X: 15, tamponPos2X: 40,
   showRainures: false, rainureMode: 'decoupe', nbRainures: 1, rainureH: 3, rainureOffY: 4, rainureMargin: 4, rainureRadius: 2,
@@ -1831,21 +1939,21 @@ const DEFAULT_WAGON = {
   showEquipA: false, equipAForme:'rect', equipAZone:'toit', equipANb:1, equipAX:20, equipAL:40, equipAW:25, equipAH:10, equipABL:0, equipAR:2, equipAGrille:false, equipAGW:5, equipAGH:5, equipAGT:0.5, equipAGM:2, equipABisLong:false, equipABisLongAngle:15, equipAToitEpouse:false,
   showEquipB: false, equipBForme:'rect', equipBZone:'toit', equipBNb:1, equipBX:50, equipBL:20, equipBW:15, equipBH:8,  equipBBL:0, equipBR:2, equipBGrille:false, equipBGW:5, equipBGH:5, equipBGT:0.5, equipBGM:2, equipBBisLong:false, equipBBisLongAngle:15, equipBToitEpouse:false,
   showEquipC: false, equipCForme:'rect', equipCZone:'toit', equipCNb:1, equipCX:70, equipCL:15, equipCW:12, equipCH:6,  equipCBL:0, equipCR:2, equipCGrille:false, equipCGW:5, equipCGH:5, equipCGT:0.5, equipCGM:2, equipCBisLong:false, equipCBisLongAngle:15, equipCToitEpouse:false, showLogo: false, logoCompagnie: 'SNCF', logoNb: 1, logoPosX: 50, logoPosY: 75, logoW: 30,
-  sliderSpeed: 40, drawerWidth: 30, nbMarques: 0, marquePosY1:25, marquePosY2:50, marquePosY3:75, marquePosY4:33, marquePosY5:66, marquePosY6:90,
-  showGrille: false, nbGrilles: 1, grilleX: 60, grilleY: 20, grilleW: 30, grilleH: 20, grilleCellW: 6, grilleCellH: 4, grilleCellR: 1, grilleGap: 2, grilleR: 2, bogieEncoche: false, bogieEncW: 8, bogieEncH: 6, bogieEncBiseau: 0, bogiePos1: 20, bogiePos2: 80, bogieEncOffsetY: 0, showCotes: true, showFusionFlancs: false, showPiecesBogies: false,
+  sliderSpeed: 40, drawerWidth: 60, nbMarques: 0, marquePosY1:25, marquePosY2:50, marquePosY3:75, marquePosY4:33, marquePosY5:66, marquePosY6:90,
+  showGrille: false, nbGrilles: 1, grilleX: 60, grilleY: 20, grilleW: 30, grilleH: 20, grilleCellW: 6, grilleCellH: 4, grilleCellR: 1, grilleGap: 2, grilleR: 2, bogieEncoche: false, bogieEncW: 8, bogieEncW2: 8, bogieEncH: 6, bogieEncBiseau: 0, bogiePos1: 20, bogiePos2: 80, bogieEncOffsetY: 0, showCotes: true, showFusionFlancs: false, showPiecesBogies: false,
   tab: 'patron'
 };
 const DEFAULT_LOCO  = {
   vehicle: 'loco',
   longueur: 180, largeur: 54, hauteur: 45, epaisseur: 3,
   toit: 'plat', segments: 4, toitHauteur: 15, coupoleEcras: 0,
-  nbFen: 4, wFen: 22, hFen: 16, yFen: 30, radiusFen: 3, fenSplit: false, fenContour: false, fenContourEp: 2,
+  nbFen: 4, wFen: 22, hFen: 16, yFen: 30, radiusFen: 3, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenContour: false, fenContourEp: 2,
   nbPortes: 0, wPorte1:18, wPorte2:18, wPorte3:18, radiusPorte: 2, portePosX: 25, portePosX2: 75, portePosX3: 50, porteDouble: false,
   porteMargH: 2, porteMargB: 2, showMainsMontoires: false, mainsMY1: 30, mainsMEsp: 15, mainsMMarg: 4, nbReliefPorte1:1, nbReliefPorte2:1, nbReliefPorte3:1, reliefPorteW1:14, reliefPorteH1:20, reliefPorteW2:14, reliefPorteH2:20, reliefPorteW3:14, reliefPorteH3:20, reliefPorteGap: 4, reliefPorteOffsetY: 0,
   nez: 'casse', rtgInclin: 30, rtgArrondi: 20, nezAngle: 30, nezH: 60, cabine: 25, cabineArriere: 25, showBombage: false, bombageSag: 5, bombageEsp: 5, showGabarit: false, showGabaritCoins: false, gabaritEp: 20, showRadiusCoinsNez: false, coinsNezType: 'none', radiusCoinsNez: 8, gabaritEpCoins: 20, nezRadius: 0, nezBiaisProfilePts: [], nezBiaisNbPoints: 5, nezBiaisBezier: true, nezBiaisRainEsp: 5, nezBiaisTipRadius: 0, nezFaceType: 'plat', nezFaceAngle: 20, nezFaceAngle2: 20, nezRTGAngle: 20, nezRTGArc: 30, showBiseauJonction: false, biseauJonctionH: 5, nezTurboArc: 10, nezTurboIncl: 20, nezSymetrie: false, showEncocheFace: false, encocheFaceW: 30, encocheFaceH: 10, encocheFaceX: 50, encocheFaceBiseau: 0, showPareChocs: false, pareChocsEp: 5, showChassePierre: false, chasseW: 60, chasseH: 30, chasseBiseau: 15, chasseNbLames: 4, chasseLameH: 3, chasseSuppW: 20, chasseSuppBiseau: 15, showArretePli: false, arretePliPos: 30, arretePliVal: 5, showCourbeBasNez: false, arretePliDir: 'haut',
   radiusToit: 5, radiusCoins: 5, radiusFondJonction: 3,
   showRelief: false, reliefScale: 70, reliefOffsetY: 0,
-  showPhares: false, showCalePhare: false, showFenCabine: false, fenCabineToitEpouse: false, fenCabineContour: false, fenCabineRatio: 50, fenCabineContourEp: 2, fenCabineForme: 'rect', fenCabineW: 12, fenCabineH: 10, fenCabineR: 2, fenCabineY: 30, fenCabineMarg: 5, calePhareW: 12, calePhareH: 1, nbPhares: 2, diamePhare: 8, phareY: 25, phareMarg: 4, phareForme: 'cercle', phareDouble: false, phareEsp: 2, phareContour: false, phareContourEp: 2,
+  showPhares: false, showCalePhare: false, showFenCabine: false, fenCabineToitEpouse: false, fenCabineContour: false, fenCabineRatio: 50, fenCabineContourEp: 2, showAuvent: false, auventH: 5, auventRatio: 75, auventBiseau: 0, fenCabineForme: 'rect', fenCabineW: 12, fenCabineH: 10, fenCabineR: 2, fenCabineY: 30, fenCabineMarg: 5, calePhareW: 12, calePhareH: 1, nbPhares: 2, diamePhare: 8, phareY: 25, phareMarg: 4, phareForme: 'cercle', phareDouble: false, phareDoubleOrient: 'horizontal', phareEsp: 2, phareContour: false, phareContourEp: 2,
   showCouloir: false, couloirW: 55, couloirH: 45, couloirD: 20, couloirNbPlis: 4, couloirEp: 6,
   showTampons: false, tamponNb: 2, tamponW: 12, tamponH: 12, tamponD: 8, tamponBiseaux: 0, tamponRadius: 2, tamponPosY: 80, tamponPos1X: 15, tamponPos2X: 40,
   showRainures: false, rainureMode: 'decoupe', nbRainures: 1, rainureH: 3, rainureOffY: 4, rainureMargin: 4, rainureRadius: 2,
@@ -1854,8 +1962,8 @@ const DEFAULT_LOCO  = {
   showEquipA: false, equipAForme:'rect', equipAZone:'toit', equipANb:1, equipAX:20, equipAL:40, equipAW:25, equipAH:10, equipABL:0, equipAR:2, equipAGrille:false, equipAGW:5, equipAGH:5, equipAGT:0.5, equipAGM:2, equipABisLong:false, equipABisLongAngle:15, equipAToitEpouse:false,
   showEquipB: false, equipBForme:'rect', equipBZone:'toit', equipBNb:1, equipBX:50, equipBL:20, equipBW:15, equipBH:8,  equipBBL:0, equipBR:2, equipBGrille:false, equipBGW:5, equipBGH:5, equipBGT:0.5, equipBGM:2, equipBBisLong:false, equipBBisLongAngle:15, equipBToitEpouse:false,
   showEquipC: false, equipCForme:'rect', equipCZone:'toit', equipCNb:1, equipCX:70, equipCL:15, equipCW:12, equipCH:6,  equipCBL:0, equipCR:2, equipCGrille:false, equipCGW:5, equipCGH:5, equipCGT:0.5, equipCGM:2, equipCBisLong:false, equipCBisLongAngle:15, equipCToitEpouse:false, showLogo: false, logoCompagnie: 'SNCF', logoNb: 1, logoPosX: 50, logoPosY: 75, logoW: 30,
-  sliderSpeed: 40, drawerWidth: 30, nbMarques: 0, marquePosY1:25, marquePosY2:50, marquePosY3:75, marquePosY4:33, marquePosY5:66, marquePosY6:90,
-  showGrille: false, nbGrilles: 1, grilleX: 60, grilleY: 20, grilleW: 30, grilleH: 20, grilleCellW: 6, grilleCellH: 4, grilleCellR: 1, grilleGap: 2, grilleR: 2, bogieEncoche: false, bogieEncW: 8, bogieEncH: 6, bogieEncBiseau: 0, bogiePos1: 20, bogiePos2: 80, bogieEncOffsetY: 0, showCotes: true, showFusionFlancs: false, showPiecesBogies: false,
+  sliderSpeed: 40, drawerWidth: 60, nbMarques: 0, marquePosY1:25, marquePosY2:50, marquePosY3:75, marquePosY4:33, marquePosY5:66, marquePosY6:90,
+  showGrille: false, nbGrilles: 1, grilleX: 60, grilleY: 20, grilleW: 30, grilleH: 20, grilleCellW: 6, grilleCellH: 4, grilleCellR: 1, grilleGap: 2, grilleR: 2, bogieEncoche: false, bogieEncW: 8, bogieEncW2: 8, bogieEncH: 6, bogieEncBiseau: 0, bogiePos1: 20, bogiePos2: 80, bogieEncOffsetY: 0, showCotes: true, showFusionFlancs: false, showPiecesBogies: false,
   tab: 'patron'
 };
 
@@ -1866,8 +1974,24 @@ const DEFAULT_MARCHANDISE = {
   // Spécifique loco marchandise (V100/V212)
   capotAvantL: 60,        // longueur capot avant (mm)
   capotArriereL: 40,      // longueur capot arrière (mm)
-  cabineMarPct: 30,       // largeur cabine en % de la longueur totale
+  cabineCentraleL: 60,    // longueur cabine centrale (mm) — quand modifiée, capots ajustés symétriquement
+  cabineCentraleX: 50,    // position du centre de la cabine en % de la longueur (0=gauche, 100=droite)
+  cabineMarPct: 30,       // (legacy, conservé pour compat)
   capotsH: 30,            // hauteur des capots (mm)
+  plancherAvantReduit: false, // toggle pour activer la réduction du plancher avant
+  plancherAvantPct: 60,   // largeur du plancher avant en % de S.largeur
+  plancherAvantBis: 0,    // biseau (mm) sur les 2 angles internes de l'encoche U
+  cabineLargeur: 70,      // largeur de la cabine (mm) — init = S.largeur + 10
+  cabineHauteur: 25,      // hauteur de la cabine (mm) — la zone surélevée au-dessus du capot
+  cabineHautForme: 'plat',// forme du haut des FACE AV/AR CABINE (plat | arrondis | biseaux | arc)
+  cabineHautR: 8,         // rayon des coins arrondis
+  cabineHautB: 8,         // profondeur du biseau
+  cabineHautArc: 10,      // sagitta de l'arc
+  cabineDessusDebord: 5,  // débord du dessus cabine (par côté, mm)
+  showCabineDebord: false,
+  cabineDebordW: 70,       // largeur de la cabine débordante (mm)
+  cabineDebordH: 15,       // hauteur de la zone de débord au-dessus des capots (mm)
+  cabineDebordBiseau: 0,   // profondeur du biseau aux 2 coins supérieurs (mm)
   showGrillesAvant: false,
   showGrillesArriere: false,
   showGrillesCotes: false,
@@ -1875,13 +1999,15 @@ const DEFAULT_MARCHANDISE = {
   // Phares
   showPharesAvant: false, showPharesArriere: false,
   nbPhares: 2, diamePhare: 8, phareY: 50, phareMarg: 4, phareForme: 'cercle',
-  phareDouble: false, phareEsp: 2, phareContour: false, phareContourEp: 2,
+  phareDouble: false, phareDoubleOrient: 'horizontal', phareEsp: 2, phareContour: false, phareContourEp: 2,
   // Fenêtres cabine
-  nbFen: 2, wFen: 18, hFen: 14, yFen: 25, radiusFen: 2, fenSplit: false, fenContour: false, fenContourEp: 2,
+  nbFen: 2, wFen: 18, hFen: 14, yFen: 25, radiusFen: 2, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenContour: false, fenContourEp: 2,
+  // Fenêtres de conduite (pour les FACE AV/AR CABINE)
+  showFenCabine: false, fenCabineToitEpouse: false, fenCabineContour: false, fenCabineRatio: 50, fenCabineContourEp: 2, showAuvent: false, auventH: 5, auventRatio: 75, auventBiseau: 0, fenCabineForme: 'rect', fenCabineW: 12, fenCabineH: 10, fenCabineR: 2, fenCabineY: 30, fenCabineMarg: 5,
   // Tampons
   showTampons: false, tamponNb: 2, tamponW: 12, tamponH: 12, tamponD: 8, tamponBiseaux: 0, tamponRadius: 2, tamponPosY: 80, tamponPos1X: 15, tamponPos2X: 40,
   // Bogies
-  showBogies: false, bogieHauteur: 0, bogieEncoche: false, bogieEncW: 8, bogieEncH: 6, bogieEncBiseau: 0, bogiePos1: 20, bogiePos2: 80, bogieEncOffsetY: 0, showPiecesBogies: false,
+  showBogies: false, bogieHauteur: 0, bogieEncoche: false, bogieEncW: 8, bogieEncW2: 8, bogieEncH: 6, bogieEncBiseau: 0, bogiePos1: 20, bogiePos2: 80, bogieEncOffsetY: 0, showPiecesBogies: false,
   // Relief
   showRelief: false, reliefScale: 70, reliefOffsetY: 0,
   // Marques / logo / cotes
@@ -1891,7 +2017,7 @@ const DEFAULT_MARCHANDISE = {
   // Toit/coins
   radiusToit: 5, radiusCoins: 5, radiusFondJonction: 3,
   // Slider speed
-  sliderSpeed: 40, drawerWidth: 30,
+  sliderSpeed: 40, drawerWidth: 60,
   tab: 'patron'
 };
 
@@ -1960,14 +2086,87 @@ function sl(id, key) {
   addSliderTouchSlowdown(el);
 }
 sl('longueur','longueur'); sl('largeur','largeur'); sl('hauteur','hauteur'); sl('epaisseur','epaisseur');
-sl('segments','segments'); sl('toitHauteur','toitHauteur'); sl('coupoleEcras','coupoleEcras'); sl('nbFen','nbFen'); sl('wFen','wFen'); sl('hFen','hFen');
+sl('segments','segments'); sl('toitHauteur','toitHauteur'); sl('coupoleEcras','coupoleEcras'); sl('nbFen','nbFen'); sl('wFen','wFen'); sl('hFen','hFen'); sl('yFen2','yFen2'); sl('hFen2','hFen2'); sl('xFen2','xFen2');
 sl('yFen','yFen'); sl('radiusFen','radiusFen'); sl('fenContourEp','fenContourEp'); for(let _w=1;_w<=3;_w++) sl('wPorte'+_w,'wPorte'+_w); sl('portePosX','portePosX'); sl('portePosX2','portePosX2'); sl('portePosX3','portePosX3'); sl('radiusPorte','radiusPorte');
 sl('porteMargH','porteMargH'); sl('porteMargB','porteMargB'); sl('mainsMY1','mainsMY1'); sl('mainsMEsp','mainsMEsp'); sl('mainsMMarg','mainsMMarg');
 for(let _p=1;_p<=3;_p++){sl('nbReliefPorte'+_p,'nbReliefPorte'+_p); sl('reliefPorteW'+_p,'reliefPorteW'+_p); sl('reliefPorteH'+_p,'reliefPorteH'+_p);} sl('reliefPorteGap','reliefPorteGap'); sl('reliefPorteOffsetY','reliefPorteOffsetY');
-sl('encocheFaceW','encocheFaceW'); sl('encocheFaceH','encocheFaceH'); sl('encocheFaceX','encocheFaceX'); sl('encocheFaceBiseau','encocheFaceBiseau'); sl('rtgInclin','rtgInclin'); sl('rtgArrondi','rtgArrondi'); sl('nezAngle','nezAngle'); sl('nezH','nezH'); sl('cabine','cabine'); sl('cabineArriere','cabineArriere'); sl('nezRadius','nezRadius'); sl('arretePliPos','arretePliPos'); sl('chasseW','chasseW'); sl('chasseH','chasseH'); sl('chasseBiseau','chasseBiseau'); sl('chasseNbLames','chasseNbLames'); sl('chasseLameH','chasseLameH'); sl('chasseSuppW','chasseSuppW'); sl('chasseSuppBiseau','chasseSuppBiseau'); sl('arretePliVal','arretePliVal'); sl('nezBiaisRainEsp','nezBiaisRainEsp'); sl('nezTurboArc','nezTurboArc'); sl('nezTurboIncl','nezTurboIncl'); sl('bombageSag','bombageSag'); sl('bombageEsp','bombageEsp'); sl('gabaritEp','gabaritEp'); sl('radiusCoinsNez','radiusCoinsNez'); sl('gabaritEpCoins','gabaritEpCoins'); sl('bogieEncW','bogieEncW'); sl('grilleX','grilleX'); sl('grilleY','grilleY'); sl('grilleW','grilleW'); sl('grilleH','grilleH'); sl('grilleCellW','grilleCellW'); sl('grilleCellH','grilleCellH'); sl('grilleCellR','grilleCellR'); sl('grilleGap','grilleGap'); sl('grilleR','grilleR'); sl('pareChocsEp','pareChocsEp'); sl('capotAvantL','capotAvantL'); sl('capotArriereL','capotArriereL'); sl('cabineMarPct','cabineMarPct'); sl('capotsH','capotsH'); sl('grilleMarCellW','grilleMarCellW'); sl('grilleMarCellH','grilleMarCellH'); sl('grilleMarGap','grilleMarGap'); sl('grilleMarMarg','grilleMarMarg');
+sl('encocheFaceW','encocheFaceW'); sl('encocheFaceH','encocheFaceH'); sl('encocheFaceX','encocheFaceX'); sl('encocheFaceBiseau','encocheFaceBiseau'); sl('rtgInclin','rtgInclin'); sl('rtgArrondi','rtgArrondi'); sl('nezAngle','nezAngle'); sl('nezH','nezH'); sl('cabine','cabine'); sl('cabineArriere','cabineArriere'); sl('nezRadius','nezRadius'); sl('arretePliPos','arretePliPos'); sl('chasseW','chasseW'); sl('chasseH','chasseH'); sl('chasseBiseau','chasseBiseau'); sl('chasseNbLames','chasseNbLames'); sl('chasseLameH','chasseLameH'); sl('chasseSuppW','chasseSuppW'); sl('chasseSuppBiseau','chasseSuppBiseau'); sl('arretePliVal','arretePliVal'); sl('nezBiaisRainEsp','nezBiaisRainEsp'); sl('nezTurboArc','nezTurboArc'); sl('nezTurboIncl','nezTurboIncl'); sl('bombageSag','bombageSag'); sl('bombageEsp','bombageEsp'); sl('gabaritEp','gabaritEp'); sl('radiusCoinsNez','radiusCoinsNez'); sl('gabaritEpCoins','gabaritEpCoins'); sl('bogieEncW','bogieEncW'); sl('bogieEncW2','bogieEncW2'); sl('grilleX','grilleX'); sl('grilleY','grilleY'); sl('grilleW','grilleW'); sl('grilleH','grilleH'); sl('grilleCellW','grilleCellW'); sl('grilleCellH','grilleCellH'); sl('grilleCellR','grilleCellR'); sl('grilleGap','grilleGap'); sl('grilleR','grilleR'); sl('pareChocsEp','pareChocsEp'); sl('capotAvantL','capotAvantL'); sl('capotArriereL','capotArriereL'); sl('cabineMarPct','cabineMarPct'); sl('capotsH','capotsH'); sl('grilleMarCellW','grilleMarCellW'); sl('grilleMarCellH','grilleMarCellH'); sl('grilleMarGap','grilleMarGap'); sl('grilleMarMarg','grilleMarMarg'); sl('cabineDebordW','cabineDebordW'); sl('cabineDebordH','cabineDebordH'); sl('cabineDebordBiseau','cabineDebordBiseau'); sl('cabineLargeur','cabineLargeur'); sl('cabineHauteur','cabineHauteur'); sl('plancherAvantPct','plancherAvantPct'); sl('plancherAvantBis','plancherAvantBis'); sl('cabineHautR','cabineHautR'); sl('cabineHautB','cabineHautB'); sl('cabineHautArc','cabineHautArc'); sl('cabineDessusDebord','cabineDessusDebord');
   ['A','B','C'].forEach(k => { ['Nb','X','L','W','H','BL','BW','R','GW','GH','GT','GM'].forEach(p => sl('equip'+k+p,'equip'+k+p)); }); sl('bogieEncH','bogieEncH'); sl('bogieHauteur','bogieHauteur'); sl('bogieEncBiseau','bogieEncBiseau'); sl('bogiePos1','bogiePos1'); sl('bogiePos2','bogiePos2'); sl('bogieEncOffsetY','bogieEncOffsetY'); sl('nezFaceAngle','nezFaceAngle'); sl('nezFaceAngle2','nezFaceAngle2'); sl('nezRTGAngle','nezRTGAngle'); sl('nezRTGArc','nezRTGArc'); sl('biseauJonctionH','biseauJonctionH');
+
+// ── cabineCentraleL : quand on bouge ce slider en mode marchandise,
+//    Cav/Car sont ajustés en gardant la position cabineCentraleX ──
+function _applyCabineCentrale() {
+  if (S.vehicle !== 'marchandise') return;
+  const cabL = S.cabineCentraleL;
+  const xPct = (S.cabineCentraleX !== undefined ? S.cabineCentraleX : 50);
+  const restant = Math.max(20, S.longueur - cabL);
+  // Position du centre cabine en mm depuis l'avant
+  const cabCenter = S.longueur * xPct / 100;
+  // Cav = position du centre - moitié cabine
+  let Cav = cabCenter - cabL / 2;
+  let Car = S.longueur - Cav - cabL;
+  // Clamp pour respecter les minimums
+  if (Cav < 10) { Cav = 10; Car = restant - 10; }
+  if (Car < 10) { Car = 10; Cav = restant - 10; }
+  S.capotAvantL   = Math.max(10, Math.round(Cav));
+  S.capotArriereL = Math.max(10, S.longueur - S.capotAvantL - cabL);
+  // Sync UI des capots
+  const elCav = document.getElementById('capotAvantL');
+  const elCar = document.getElementById('capotArriereL');
+  if (elCav) { elCav.value = S.capotAvantL;   const v = document.getElementById('v-capotAvantL');   if (v) v.textContent = S.capotAvantL; }
+  if (elCar) { elCar.value = S.capotArriereL; const v = document.getElementById('v-capotArriereL'); if (v) v.textContent = S.capotArriereL; }
+}
+
+(function() {
+  const el  = document.getElementById('cabineCentraleL');
+  const vEl = document.getElementById('v-cabineCentraleL');
+  if (!el) return;
+  el.addEventListener('input', () => {
+    S.cabineCentraleL = parseFloat(el.value);
+    if (vEl) vEl.textContent = el.value;
+    _applyCabineCentrale();
+    redraw();
+  });
+  addSliderTouchSlowdown(el);
+})();
+
+(function() {
+  const el  = document.getElementById('cabineCentraleX');
+  const vEl = document.getElementById('v-cabineCentraleX');
+  if (!el) return;
+  el.addEventListener('input', () => {
+    S.cabineCentraleX = parseFloat(el.value);
+    if (vEl) vEl.textContent = el.value;
+    _applyCabineCentrale();
+    redraw();
+  });
+  addSliderTouchSlowdown(el);
+})();
+
+// ── Sync inverse : quand longueur, capotAvantL ou capotArriereL changent en mode MAR,
+//    recalculer cabineCentraleL et cabineCentraleX et mettre à jour les sliders ──
+function _syncCabineCentraleL() {
+  if (S.vehicle !== 'marchandise') return;
+  const Cav = S.capotAvantL || 60;
+  const Car = S.capotArriereL || 40;
+  const cabL = Math.max(20, S.longueur - Cav - Car);
+  S.cabineCentraleL = cabL;
+  S.cabineCentraleX = Math.round((Cav + cabL/2) / S.longueur * 100);
+  const elL  = document.getElementById('cabineCentraleL');
+  const vElL = document.getElementById('v-cabineCentraleL');
+  if (elL)  elL.value = cabL;
+  if (vElL) vElL.textContent = cabL;
+  const elX  = document.getElementById('cabineCentraleX');
+  const vElX = document.getElementById('v-cabineCentraleX');
+  if (elX)  elX.value = S.cabineCentraleX;
+  if (vElX) vElX.textContent = S.cabineCentraleX;
+}
+['longueur', 'capotAvantL', 'capotArriereL'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', _syncCabineCentraleL);
+});
 sl('reliefScale','reliefScale'); sl('reliefOffsetY','reliefOffsetY');
-sl('nbPhares','nbPhares'); sl('fenCabineW','fenCabineW'); sl('fenCabineContourEp','fenCabineContourEp'); sl('fenCabineH','fenCabineH'); sl('fenCabineR','fenCabineR'); sl('fenCabineY','fenCabineY'); sl('fenCabineMarg','fenCabineMarg'); sl('fenCabineRatio','fenCabineRatio'); sl('diamePhare','diamePhare'); sl('phareY','phareY'); sl('phareMarg','phareMarg'); sl('phareContourEp','phareContourEp'); sl('calePhareW','calePhareW'); sl('calePhareH','calePhareH'); sl('phareEsp','phareEsp');
+sl('nbPhares','nbPhares'); sl('fenCabineW','fenCabineW'); sl('fenCabineContourEp','fenCabineContourEp'); sl('fenCabineH','fenCabineH'); sl('fenCabineR','fenCabineR'); sl('fenCabineY','fenCabineY'); sl('fenCabineMarg','fenCabineMarg'); sl('fenCabineRatio','fenCabineRatio'); sl('auventH','auventH'); sl('auventRatio','auventRatio'); sl('auventBiseau','auventBiseau'); sl('diamePhare','diamePhare'); sl('phareY','phareY'); sl('phareMarg','phareMarg'); sl('phareContourEp','phareContourEp'); sl('calePhareW','calePhareW'); sl('calePhareH','calePhareH'); sl('phareEsp','phareEsp');
 sl('nbMarques','nbMarques'); for(let _i=1;_i<=6;_i++) sl('marquePosY'+_i,'marquePosY'+_i);
   sl('sliderSpeed','sliderSpeed');
   sl('logoNb','logoNb'); sl('logoPosX','logoPosX'); sl('logoPosY','logoPosY'); sl('logoW','logoW');
@@ -2191,6 +2390,26 @@ document.getElementById('showPareChocs')?.addEventListener('change', e => {
     redraw();
   });
 });
+
+document.getElementById('showCabineDebord')?.addEventListener('change', e => {
+  S.showCabineDebord = e.target.checked;
+  _el('cabine-debord-opts').style.display = e.target.checked ? 'block' : 'none';
+  redraw();
+});
+
+document.getElementById('fenEtage')?.addEventListener('change', e => {
+  S.fenEtage = e.target.checked;
+  _el('fen-etage-opts').style.display = e.target.checked ? 'block' : 'none';
+  redraw();
+});
+
+document.getElementById('cabineHautForme')?.addEventListener('change', e => {
+  S.cabineHautForme = e.target.value;
+  _el('f-cabineHautR').style.display   = (e.target.value === 'arrondis') ? 'block' : 'none';
+  _el('f-cabineHautB').style.display   = (e.target.value === 'biseaux')  ? 'block' : 'none';
+  _el('f-cabineHautArc').style.display = (e.target.value === 'arc')      ? 'block' : 'none';
+  redraw();
+});
 document.getElementById('showArretePli')?.addEventListener('change', e => {
   S.showArretePli = e.target.checked;
   _el('arrete-pli-opts').style.display = e.target.checked ? 'block' : 'none';
@@ -2244,6 +2463,24 @@ document.getElementById('showCalePhare')?.addEventListener('change', e => {
 document.getElementById('phareDouble')?.addEventListener('change', e => {
   S.phareDouble = e.target.checked;
   _el('f-phareEsp').style.display = e.target.checked ? 'block' : 'none';
+  _el('f-phareDoubleOrient').style.display = e.target.checked ? 'block' : 'none';
+  redraw();
+});
+document.getElementById('phareDoubleOrient')?.addEventListener('change', e => {
+  S.phareDoubleOrient = e.target.value;
+  redraw();
+});
+
+document.getElementById('showAuvent')?.addEventListener('change', e => {
+  S.showAuvent = e.target.checked;
+  _el('auvent-opts').style.display = e.target.checked ? 'block' : 'none';
+  redraw();
+});
+
+document.getElementById('plancherAvantReduit')?.addEventListener('change', e => {
+  S.plancherAvantReduit = e.target.checked;
+  _el('f-plancherAvantPct').style.display = e.target.checked ? 'block' : 'none';
+  _el('f-plancherAvantBis').style.display = e.target.checked ? 'block' : 'none';
   redraw();
 });
 document.getElementById('phareContour')?.addEventListener('change', e => {
@@ -2288,6 +2525,25 @@ document.getElementById('porteDouble')?.addEventListener('change', e => { S.port
 document.getElementById('nezSymetrie')?.addEventListener('change', e => {
   S.nezSymetrie = e.target.checked;
   _el('f-cabineArriere').style.display = e.target.checked ? 'block' : 'none';
+  // Ajustement automatique de la longueur pour que le nez arrière s'ajoute
+  // sans rogner sur la cabine
+  if (e.target.checked) {
+    // Activation : mémoriser la longueur actuelle, puis ajouter la taille du nez arrière
+    S._longueurAvantSym = S.longueur;
+    const nezArrL = Math.round(S.longueur * S.cabineArriere / 100);
+    S.longueur = Math.min(500, S.longueur + nezArrL);
+  } else {
+    // Désactivation : restaurer la longueur mémorisée si elle existe
+    if (S._longueurAvantSym && S._longueurAvantSym > 0) {
+      S.longueur = S._longueurAvantSym;
+      S._longueurAvantSym = null;
+    }
+  }
+  // Sync UI du slider longueur
+  const elL  = document.getElementById('longueur');
+  const vElL = document.getElementById('v-longueur');
+  if (elL)  elL.value = S.longueur;
+  if (vElL) vElL.textContent = S.longueur;
   redraw();
 });
 function updateNezCourbureUI() {
@@ -2342,6 +2598,12 @@ function switchVehicle(v) {
   _el('sec-phares').style.display       = (isLoco || isMar) ? 'block' : 'none';
   const secMar = _el('sec-marchandise');
   if (secMar) secMar.style.display      = isMar ? 'block' : 'none';
+  const fCab = _el('f-cabineCentraleL');
+  if (fCab) fCab.style.display          = isMar ? 'block' : 'none';
+  const fCabX = _el('f-cabineCentraleX');
+  if (fCabX) fCabX.style.display        = isMar ? 'block' : 'none';
+  const btnMar = _el('btn-nav-mar');
+  if (btnMar) btnMar.style.display      = isMar ? '' : 'none';
   syncUIFromState();
   redraw();
 }
@@ -2708,7 +2970,7 @@ function openDrawer(sectionId, el) {
   if (_drawerSection) restoreDrawerSection();
 
   // Largeur depuis les options
-  drawer.style.width = (S.drawerWidth || 30) + '%';
+  drawer.style.width = (S.drawerWidth || 60) + '%';
 
   // Titre
   const stitle = el.querySelector('.stitle');
@@ -3754,9 +4016,10 @@ function drawFlancContour(px, py, isLoco) {
     if (encH) {
       const ang  = (S.bogieEncBiseau||0) * Math.PI / 180;
       const bOff = encH * Math.tan(ang);
-      [S.bogiePos1/100, S.bogiePos2/100].forEach(r => {
+      const encWs = [S.bogieEncW||8, S.bogieEncW2||8];
+      [S.bogiePos1/100, S.bogiePos2/100].forEach((r, idx) => {
         const bx = px + L * r;
-        const ew = S.bogieEncW;
+        const ew = encWs[idx];
         const lx = bx - ew/2, rx = bx + ew/2;
         if (lx < px || rx > px+L) return;
         const topY = py + Hf - encH;
@@ -3968,16 +4231,104 @@ function drawFlancContourMirror(px, py) {
   }
 }
 
+// ── Suppression de fenêtres : overlay cliquable + menu contextuel ──
+function _addFenClickable(fx, fy, fw, fh, fenId) {
+  const rect = draw.rect(fw * SC, fh * SC).move(fx * SC, fy * SC)
+    .fill('transparent')
+    .attr({ 'data-fen-id': fenId, 'pointer-events': 'all', style: 'cursor:pointer' });
+  // Menu sur clic-droit (desktop)
+  rect.on('contextmenu', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    _showFenContextMenu(e.clientX, e.clientY, fenId);
+  });
+  // Appui-long sur mobile
+  let _longTimer = null;
+  rect.on('touchstart', (e) => {
+    if (_longTimer) clearTimeout(_longTimer);
+    const t = e.touches[0];
+    const cx = t.clientX, cy = t.clientY;
+    _longTimer = setTimeout(() => {
+      e.preventDefault();
+      _showFenContextMenu(cx, cy, fenId);
+    }, 600);
+  });
+  rect.on('touchend touchmove touchcancel', () => {
+    if (_longTimer) { clearTimeout(_longTimer); _longTimer = null; }
+  });
+}
+
+function _showFenContextMenu(x, y, fenId) {
+  // Retire un menu existant
+  const old = document.getElementById('fen-ctx-menu');
+  if (old) old.remove();
+  const menu = document.createElement('div');
+  menu.id = 'fen-ctx-menu';
+  menu.style.cssText = `position:fixed;left:${x}px;top:${y}px;background:#fff;border:1px solid #999;border-radius:6px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);padding:4px 0;z-index:5000;font-family:DM Mono,monospace;font-size:0.7rem;`;
+  const btn = document.createElement('button');
+  btn.textContent = '🗑 Supprimer cette fenêtre';
+  btn.style.cssText = 'display:block;border:none;background:none;padding:8px 14px;cursor:pointer;width:100%;text-align:left;font:inherit';
+  btn.onmouseover = () => btn.style.background = '#f0ece3';
+  btn.onmouseout  = () => btn.style.background = 'none';
+  btn.onclick = () => {
+    if (!S.fenDeleted) S.fenDeleted = [];
+    if (S.fenDeleted.indexOf(fenId) < 0) S.fenDeleted.push(fenId);
+    menu.remove();
+    redraw();
+  };
+  menu.appendChild(btn);
+
+  // Bouton "restaurer toutes" si des fenêtres sont supprimées
+  if (S.fenDeleted && S.fenDeleted.length > 0) {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:#ddd;margin:4px 0';
+    menu.appendChild(sep);
+    const btn2 = document.createElement('button');
+    btn2.textContent = `↺ Restaurer toutes (${S.fenDeleted.length})`;
+    btn2.style.cssText = 'display:block;border:none;background:none;padding:8px 14px;cursor:pointer;width:100%;text-align:left;font:inherit';
+    btn2.onmouseover = () => btn2.style.background = '#f0ece3';
+    btn2.onmouseout  = () => btn2.style.background = 'none';
+    btn2.onclick = () => {
+      S.fenDeleted = [];
+      menu.remove();
+      redraw();
+    };
+    menu.appendChild(btn2);
+  }
+
+  document.body.appendChild(menu);
+  // Fermer au clic ailleurs
+  setTimeout(() => {
+    const close = (ev) => {
+      if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', close); document.removeEventListener('touchstart', close); }
+    };
+    document.addEventListener('click', close);
+    document.addEventListener('touchstart', close);
+  }, 50);
+}
+
 function drawFenetres(px, py, W, H) {
+  // Étage 1 (niveau bas) — paramètres standard
+  _drawFenetresOneLevel(px, py, W, H, S.yFen, S.hFen, 0, 0);
+  // Étage 2 (niveau haut) si activé
+  if (S.fenEtage) {
+    // Le décalage X est en %, conversion en mm via le step calculé localement
+    // Pour simplifier, on passe le décalage en pixels et chaque appel le retraite
+    _drawFenetresOneLevel(px, py, W, H, S.yFen2 || 60, S.hFen2 || 12, 1, ((S.xFen2||50) - 50) / 100);
+  }
+}
+
+function _drawFenetresOneLevel(px, py, W, H, yPct, fhVal, levelIdx, xOffsetRatio) {
   const nb = S.nbFen;
   if (nb <= 0) return;
   const r = S.radiusFen;
   const margin = 4;
   const isLoco = S.vehicle === 'loco';
 
-  // Position Y fixe
-  const fy = py + H * S.yFen / 100;
-  const fh = S.hFen;
+  // Position Y du niveau
+  const fy = py + H * yPct / 100;
+  const fh = fhVal;
 
   // Zone nez loco (côté gauche)
   const nezEnd = (isLoco && S.nez !== 'plat')
@@ -4050,9 +4401,15 @@ function drawFenetres(px, py, W, H) {
     const step = Math.max(S.wFen + minGap, zoneW / (n + 1));
     // Recentrer le groupe dans la zone
     const totalGroupW = step * (n - 1) + S.wFen;
-    const startX = x0 + (zoneW - totalGroupW) / 2;
+    // Décalage X pour l'étage 2 : xOffsetRatio est dans [-0.5, +0.5]
+    // Effet : déplacer le startX d'une fraction du step entre les fenêtres
+    const xOffsetMm = (xOffsetRatio || 0) * step;
+    const startX = x0 + (zoneW - totalGroupW) / 2 + xOffsetMm;
     for (let i = 0; i < n; i++) {
       const fx = px + startX + i * step;
+      const fenId = `fen_${levelIdx}_${i}_z${perZone.indexOf(perZone.find(p => p.x0 === x0))}`;
+      const deletedList = S.fenDeleted || [];
+      if (deletedList.indexOf(fenId) >= 0) continue;
       if (S.fenSplit) {
         // Double vitrage : 2 rectangles horizontaux (haut et bas), séparés au milieu
         const halfH = (fh - 1) / 2; // -1mm pour la séparation
@@ -4094,6 +4451,8 @@ function drawFenetres(px, py, W, H) {
         const rw = S.wFen * sc2, rh = fh * sc2;
         reliefRect(fx + (S.wFen-rw)/2, fy + (fh-rh)/2 + S.reliefOffsetY, rw, rh, r * sc2);
       }
+      // Zone cliquable invisible pour suppression via clic-droit / appui-long
+      _addFenClickable(fx, fy, S.wFen, fh, fenId);
     }
   });
 }
@@ -4114,8 +4473,10 @@ function drawPhares(px, py, pw, ph) {
   const marg = S.phareMarg;
   const nb   = S.nbPhares;
 
-  // Largeur d'un groupe (simple = d, double = d + esp + d/2)
-  const gW = S.phareDouble ? d + esp + d/2 : d;
+  // Largeur d'un groupe (simple = d, double horizontal = d + esp + d/2, double vertical = d)
+  const gW = S.phareDouble
+    ? (S.phareDoubleOrient === 'vertical' ? d : d + esp + d/2)
+    : d;
 
   // Vérifier que les groupes rentrent
   const totalGW = nb * gW + (nb - 1) * Math.max(2, (pw - 2*marg - nb*gW) / Math.max(nb-1, 1));
@@ -4146,57 +4507,73 @@ function drawPhares(px, py, pw, ph) {
   gCenters.forEach((gx, gi) => {
     if (S.phareDouble) {
       const d2 = d / 2;
-      // Symétrie : groupes à gauche du milieu → grand|petit, à droite → petit|grand
+      const orient = S.phareDoubleOrient || 'horizontal';
       const miroir = gi > midIdx;
 
-      let cxGrand, cxPetit;
-      if (!miroir) {
-        cxGrand = gx - esp/2 - d/2;
-        cxPetit = gx + esp/2 + d2/2;
+      let cxGrand, cyGrand, cxPetit, cyPetit;
+      if (orient === 'vertical') {
+        // L'un au-dessus de l'autre — grand en haut, petit en bas
+        cxGrand = gx;
+        cxPetit = gx;
+        cyGrand = yc - esp/2 - d/2;
+        cyPetit = yc + esp/2 + d2/2;
       } else {
-        cxPetit = gx - esp/2 - d2/2;
-        cxGrand = gx + esp/2 + d/2;
+        // Horizontal (côte à côte) — symétrie autour du milieu
+        if (!miroir) {
+          cxGrand = gx - esp/2 - d/2;
+          cxPetit = gx + esp/2 + d2/2;
+        } else {
+          cxPetit = gx - esp/2 - d2/2;
+          cxGrand = gx + esp/2 + d/2;
+        }
+        cyGrand = yc;
+        cyPetit = yc;
       }
 
-      // Contour = silhouette offset des 2 cercles (arc gauche grand + tangentes + arc droit petit)
+      // Contour = silhouette offset des 2 cercles
       if (S.phareContour) {
-        // Rayons avec offset
-        const R1 = d/2 + ep;   // grand avec offset
-        const R2 = d2/2 + ep;  // petit avec offset
-
-        // Selon orientation : grand à gauche ou droite
-        const cL = !miroir ? cxGrand : cxPetit; // centre cercle gauche
-        const cR = !miroir ? cxPetit : cxGrand; // centre cercle droit
-        const RL = !miroir ? R1 : R2;           // rayon gauche
-        const RR = !miroir ? R2 : R1;           // rayon droit
-
-        // Path clockwise :
-        // 1. Top-left de la forme (haut du cercle gauche)
-        // 2. Tangente haute vers le cercle droit
-        // 3. Arc droit du cercle droit (semi-cercle droit, clockwise)
-        // 4. Tangente basse vers cercle gauche
-        // 5. Arc gauche du cercle gauche (semi-cercle gauche, counterclockwise)
+        const R1 = d/2 + ep;
+        const R2 = d2/2 + ep;
         const sc = SC;
-        const d_ = `M${(cL)*sc},${(yc-RL)*sc}` +
-          ` L${(cR)*sc},${(yc-RR)*sc}` +
-          ` A${RR*sc},${RR*sc} 0 1 1 ${(cR)*sc},${(yc+RR)*sc}` +
-          ` L${(cL)*sc},${(yc+RL)*sc}` +
-          ` A${RL*sc},${RL*sc} 0 1 1 ${(cL)*sc},${(yc-RL)*sc}` +
-          ' Z';
-        draw.path(d_).fill('none').stroke({ color: FOLD, width: 1.2 });
+
+        if (orient === 'vertical') {
+          // Top : grand (haut), Bottom : petit (bas)
+          const cT = cyGrand, cB = cyPetit;
+          const RT = R1, RB = R2;
+          const xc = cxGrand;
+          const d_ = `M${(xc-RT)*sc},${cT*sc}` +
+            ` L${(xc-RB)*sc},${cB*sc}` +
+            ` A${RB*sc},${RB*sc} 0 1 0 ${(xc+RB)*sc},${cB*sc}` +
+            ` L${(xc+RT)*sc},${cT*sc}` +
+            ` A${RT*sc},${RT*sc} 0 1 0 ${(xc-RT)*sc},${cT*sc}` +
+            ' Z';
+          draw.path(d_).fill('none').stroke({ color: FOLD, width: 1.2 });
+        } else {
+          const cL = !miroir ? cxGrand : cxPetit;
+          const cR = !miroir ? cxPetit : cxGrand;
+          const RL = !miroir ? R1 : R2;
+          const RR = !miroir ? R2 : R1;
+          const d_ = `M${(cL)*sc},${(yc-RL)*sc}` +
+            ` L${(cR)*sc},${(yc-RR)*sc}` +
+            ` A${RR*sc},${RR*sc} 0 1 1 ${(cR)*sc},${(yc+RR)*sc}` +
+            ` L${(cL)*sc},${(yc+RL)*sc}` +
+            ` A${RL*sc},${RL*sc} 0 1 1 ${(cL)*sc},${(yc-RL)*sc}` +
+            ' Z';
+          draw.path(d_).fill('none').stroke({ color: FOLD, width: 1.2 });
+        }
       }
 
       // Grand phare
       if (S.phareForme === 'cercle') {
-        draw.circle(d*SC).center(cxGrand*SC, yc*SC).fill('none').stroke({color:FOLD,width:1.2});
+        draw.circle(d*SC).center(cxGrand*SC, cyGrand*SC).fill('none').stroke({color:FOLD,width:1.2});
       } else {
-        cutRect(cxGrand-d/2, yc-d/2, d, d, Math.min(1.5, d/4));
+        cutRect(cxGrand-d/2, cyGrand-d/2, d, d, Math.min(1.5, d/4));
       }
       // Petit phare
       if (S.phareForme === 'cercle') {
-        draw.circle(d2*SC).center(cxPetit*SC, yc*SC).fill('none').stroke({color:FOLD,width:1.2});
+        draw.circle(d2*SC).center(cxPetit*SC, cyPetit*SC).fill('none').stroke({color:FOLD,width:1.2});
       } else {
-        cutRect(cxPetit-d2/2, yc-d2/2, d2, d2, Math.min(1, d2/4));
+        cutRect(cxPetit-d2/2, cyPetit-d2/2, d2, d2, Math.min(1, d2/4));
       }
     } else {
       // Phare simple
@@ -4411,6 +4788,82 @@ function drawTamponNet(px, py, idx) {
   return { w: Math.max(W + 2*sideD + 2*TAB, platW) + 4, h: H + 2*sideD + 2*TAB + platH + 16 };
 }
 
+// ── Pièces AUVENT (à coller au-dessus des fenêtres de conduite) ──
+// Calcule la largeur de chaque auvent : auventRatio% du périmètre de la fenêtre
+function getAuventWidths() {
+  if (!S.showAuvent || !S.showFenCabine) return null;
+  const totalFW = S.fenCabineW * 2;
+  const ratio = (S.fenCabineRatio !== undefined ? S.fenCabineRatio : 50) / 100;
+  const fw1 = totalFW * (1 - ratio);   // largeur fenêtre G
+  const fw2 = totalFW * ratio;          // largeur fenêtre D
+  const fh  = S.fenCabineH;
+  const aRatio = (S.auventRatio || 75) / 100;
+
+  let perim1, perim2;
+  if (S.fenCabineForme === 'cercle') {
+    // Périmètre cercle : πD avec D = min(W, H)
+    const d1 = Math.min(fw1, fh);
+    const d2 = Math.min(fw2, fh);
+    perim1 = Math.PI * d1;
+    perim2 = Math.PI * d2;
+  } else {
+    // Rectangle : 2(W + H)
+    perim1 = 2 * (fw1 + fh);
+    perim2 = 2 * (fw2 + fh);
+  }
+  return {
+    w1: Math.max(2, perim1 * aRatio),
+    w2: Math.max(2, perim2 * aRatio)
+  };
+}
+
+function drawAuvents(px, py) {
+  if (!S.showAuvent) return { w: 0, h: 0 };
+  const widths = getAuventWidths();
+  if (!widths) return { w: 0, h: 0 };
+  const h    = S.auventH || 5;
+  const bis  = Math.min(S.auventBiseau || 0, h * 0.9, Math.min(widths.w1, widths.w2) / 3);
+
+  // Helper : trace un auvent (rectangle avec biseaux optionnels aux 2 coins du haut)
+  function drawOne(x0, y0, w, label_) {
+    // Forme : rectangle avec biseau aux 2 coins supérieurs
+    // Le bas reste plat (= la base, qui se colle à la face de la cabine)
+    let path;
+    if (bis > 0.3) {
+      path = `M${x0*SC},${(y0+h)*SC}` +
+        ` L${x0*SC},${(y0+bis)*SC}` +
+        ` L${(x0+bis)*SC},${y0*SC}` +
+        ` L${(x0+w-bis)*SC},${y0*SC}` +
+        ` L${(x0+w)*SC},${(y0+bis)*SC}` +
+        ` L${(x0+w)*SC},${(y0+h)*SC}` +
+        ` Z`;
+    } else {
+      path = `M${x0*SC},${y0*SC} L${(x0+w)*SC},${y0*SC} L${(x0+w)*SC},${(y0+h)*SC} L${x0*SC},${(y0+h)*SC} Z`;
+    }
+    draw.path(path).fill('none').stroke({color:CUT, width:1.5});
+    label(x0+2, y0+2, label_, 6);
+    if (S.showCotes) {
+      cote(x0, y0+h+2, x0+w, y0+h+2, Math.round(w*10)/10+'mm', 4);
+    }
+  }
+
+  // 2 auvents G et D
+  drawOne(px, py, widths.w1, 'AUVENT G');
+  const px2 = px + widths.w1 + GAP;
+  drawOne(px2, py, widths.w2, 'AUVENT D');
+
+  // Si symétrie : 2 autres pour la face arrière
+  let totalW = widths.w1 + widths.w2 + GAP;
+  if (S.nezSymetrie) {
+    const px3 = px2 + widths.w2 + GAP*2;
+    drawOne(px3, py, widths.w1, 'AUVENT G AR');
+    const px4 = px3 + widths.w1 + GAP;
+    drawOne(px4, py, widths.w2, 'AUVENT D AR');
+    totalW += widths.w2 + GAP*2 + widths.w1 + GAP;
+  }
+  return { w: totalW, h };
+}
+
 function drawTampons(px, py) {
   if (!S.showTampons) return;
   const positions = [S.tamponPos1X];
@@ -4476,13 +4929,53 @@ function drawFenCabine(px, py, pw, ph) {
   const xRight = px + pw - marg - fw2;
 
   // Calcul du haut de la fenêtre qui épouse le toit (vu de face)
-  // Le toit vu de face = arc sur la largeur pw, sagitta = toitHauteur
-  const toitEpouse = S.fenCabineToitEpouse && S.toit !== 'plat';
+  // - Mode marchandise : le "toit" épousé = le haut de la cabine selon cabineHautForme
+  // - Autres modes : toit = arc/arrondi/coupole de la loco principale
+  const isMarMode = S.vehicle === 'marchandise';
+  let toitEpouse = false;
+  let formeM = 'plat', Rm = 0, Bm = 0, sagM = 0;
+  if (isMarMode) {
+    formeM = S.cabineHautForme || 'plat';
+    Rm  = Math.min(S.cabineHautR  || 0, ph * 0.9, pw / 2 - 1);
+    Bm  = Math.min(S.cabineHautB  || 0, ph * 0.9, pw / 2 - 1);
+    sagM = Math.min(S.cabineHautArc || 0, ph * 0.9, pw / 2 - 0.5);
+    toitEpouse = S.fenCabineToitEpouse && formeM !== 'plat'
+                 && ((formeM === 'arrondis' && Rm > 0.5) || (formeM === 'biseaux' && Bm > 0.5) || (formeM === 'arc' && sagM > 0.5));
+  } else {
+    toitEpouse = S.fenCabineToitEpouse && S.toit !== 'plat';
+  }
   const th = toitHeight();
   function roofY(x) {
     // x = position absolue sur la face, retourne le décalage vertical depuis py
-    if (!toitEpouse || th <= 0) return 0;
+    if (!toitEpouse) return 0;
     const xRel = x - px; // relatif au bord gauche de la face
+    if (isMarMode) {
+      // Hauteur du contour selon la forme du haut cabine
+      if (formeM === 'arrondis' && Rm > 0.5) {
+        // Coin arrondi : si xRel < R, arc descendant ; si > pw-R, arc descendant ; sinon 0
+        if (xRel < Rm) {
+          const dx = Rm - xRel;
+          return Rm - Math.sqrt(Math.max(0, Rm*Rm - dx*dx));
+        } else if (xRel > pw - Rm) {
+          const dx = xRel - (pw - Rm);
+          return Rm - Math.sqrt(Math.max(0, Rm*Rm - dx*dx));
+        }
+        return 0;
+      } else if (formeM === 'biseaux' && Bm > 0.5) {
+        // Chamfer : si xRel < B, descend linéairement de B à 0 ; symétrique à droite
+        if (xRel < Bm)        return Bm - xRel;
+        if (xRel > pw - Bm)   return xRel - (pw - Bm);
+        return 0;
+      } else if (formeM === 'arc' && sagM > 0.5) {
+        // Arc continu sur toute la largeur, sagitta = sagM
+        const R = (pw*pw/4 + sagM*sagM) / (2*sagM);
+        const dx = xRel - pw/2;
+        return sagM - (R - Math.sqrt(Math.max(0, R*R - dx*dx)));
+      }
+      return 0;
+    }
+    // Mode classique loco/wagon
+    if (th <= 0) return 0;
     if (S.toit === 'arrondi' || S.toit === 'coupole') {
       const R = (pw*pw/4 + th*th) / (2*th);
       const dx = xRel - pw/2;
@@ -4491,20 +4984,25 @@ function drawFenCabine(px, py, pw, ph) {
     return 0;
   }
 
-  [[xLeft, fw1, fr1], [xRight, fw2, fr2]].forEach(([fx, fw, fr]) => {
+  [[xLeft, fw1, fr1, 'cab_L'], [xRight, fw2, fr2, 'cab_R']].forEach(([fx, fw, fr, fenIdSuffix]) => {
     if (fw < 1) return;
     if (fx < px || fx + fw > px + pw) return;
+    const fenId = 'fen_' + fenIdSuffix;
+    const deletedList = S.fenDeleted || [];
+    if (deletedList.indexOf(fenId) >= 0) return;
 
     if (S.fenCabineForme === 'cercle') {
       const r = Math.min(fw, fh) / 2;
       draw.circle(r * 2 * SC)
         .center((fx + fw/2) * SC, (yc + fh/2 - r) * SC)
         .fill('none').stroke({ color: CUT, width: 1.3 });
+      _addFenClickable(fx, yc, fw, fh, fenId);
       return;
     }
 
     if (!toitEpouse) {
       cutRect(fx, yc, fw, fh, fr);
+      _addFenClickable(fx, yc, fw, fh, fenId);
       return;
     }
 
@@ -4514,8 +5012,6 @@ function drawFenCabine(px, py, pw, ph) {
     const yTopM = py + roofY(fx + fw/2);
     const yBot  = yc + fh;
 
-    // Arc approximé avec Q bezier (point de contrôle au milieu)
-    // On utilise le point le plus haut comme contrôle
     const cpY = py + roofY(fx + fw/2) - Math.abs(yTopM - (yTopL+yTopR)/2) * 0.5;
     const path =
       `M${fx*SC},${yTopL*SC}` +
@@ -4524,6 +5020,7 @@ function drawFenCabine(px, py, pw, ph) {
       ` L${fx*SC},${yBot*SC}` +
       ' Z';
     draw.path(path).fill('none').stroke({color: CUT, width: 1.3});
+    _addFenClickable(fx, Math.min(yTopL, yTopR), fw, yBot - Math.min(yTopL, yTopR), fenId);
   });
 }
 
@@ -5990,13 +6487,14 @@ function drawBogieEncoches(px, py, W, H, mirror) {
   if (!S.showBogies) return;
   const Hf = H;
   const bogieRX = [S.bogiePos1/100, S.bogiePos2/100];
-  bogieRX.forEach(rx => {
+  const encWidths = [S.bogieEncW || 8, S.bogieEncW2 || 8];
+  bogieRX.forEach((rx, idx) => {
     const bx = px + W * rx;
     const by = py + H * 0.88;
     draw.circle(5*SC).center(bx*SC, by*SC)
       .fill('none').stroke({color:'#aaa', width:0.8, dasharray:'2 2'});
     if (S.bogieEncoche) {
-      const ew = S.bogieEncW, eh = S.bogieEncH;
+      const ew = encWidths[idx], eh = S.bogieEncH;
       const ang = (S.bogieEncBiseau||0) * Math.PI / 180;
       const bOffset = eh * Math.tan(ang);
       // En miroir (flanc D fusionné), l'encoche est en HAUT de la pièce, pas en bas
@@ -6295,16 +6793,18 @@ function drawPatronMarchandise() {
   const H       = S.hauteur;
   const Cav     = Math.min(S.capotAvantL || 60, L - 30);
   const Car     = Math.min(S.capotArriereL || 40, L - Cav - 20);
-  const cabL    = L - Cav - Car;          // longueur cabine
+  const cabL    = (S.cabineCentraleL && S.cabineCentraleL > 0)
+                    ? S.cabineCentraleL
+                    : (L - Cav - Car);          // longueur cabine
   const Hcap    = Math.min(S.capotsH || 30, H - 5);
   const Hcab    = H;                       // cabine = pleine hauteur
 
   const container = document.getElementById('svg-patron');
   if (!container) return;
   container.innerHTML = '';
-  // Largeur estimée : 2 flancs + plancher + toit + capots latéraux
-  const totalW = MARGIN + L*2 + W*2 + GAP*4 + MARGIN + 60;
-  const totalH = MARGIN + H*2 + W + GAP*4 + 200;
+  // Largeur estimée : 2 flancs capot + 2 flancs cabine + plancher + toit + capots latéraux
+  const totalW = MARGIN + L*2 + cabL*2 + W*2 + GAP*8 + MARGIN + 60;
+  const totalH = MARGIN + H*2 + W + GAP*4 + 400;
   draw = SVG().addTo('#svg-patron').size(totalW * SC, totalH * SC);
 
   if (S.showGrid) {
@@ -6320,80 +6820,105 @@ function drawPatronMarchandise() {
   const flancDX = MARGIN + L + GAP;
 
   function drawFlancMar(px, py, label_) {
-    // Bord supérieur en escalier : capot avant (Hcap) → cabine (Hcab) → capot arrière (Hcap)
-    const yCap_av = py + (H - Hcap);
-    const yCab    = py;
-    const yCap_ar = py + (H - Hcap);
-    const yBot    = py + H;
+    // Flanc CAPOT séparé : rectangle plein de hauteur Hcap, en bas (de yCap à yBot)
+    // La cabine est dessinée comme une pièce séparée qui se colle par-dessus.
+    const yCap = py + (H - Hcap);   // sommet des capots
+    const yBot = py + H;             // bas du flanc
+    rrect(px, yCap, L, Hcap, 0, 'none', CUT, 1.5);
+    label(px+2, yCap+2, label_ + ' (capot)', 7);
 
-    const path =
-      `M${px*SC},${yCap_av*SC}` +
-      ` L${(px+Cav)*SC},${yCap_av*SC}` +
-      ` L${(px+Cav)*SC},${yCab*SC}` +
-      ` L${(px+Cav+cabL)*SC},${yCab*SC}` +
-      ` L${(px+Cav+cabL)*SC},${yCap_ar*SC}` +
-      ` L${(px+L)*SC},${yCap_ar*SC}` +
-      ` L${(px+L)*SC},${yBot*SC}` +
-      ` L${px*SC},${yBot*SC} Z`;
-    draw.path(path).fill('none').stroke({color:CUT, width:1.5});
-    label(px+2, py+2, label_, 7);
-
-    // Marques de pli verticales aux jonctions capot/cabine (FOLD)
+    // Marques de pli verticales aux jonctions capot AV/cabine et cabine/capot AR
     if (S.showFold) {
-      foldLine(px+Cav,      yCap_av, px+Cav,      yBot);
-      foldLine(px+Cav+cabL, yCap_ar, px+Cav+cabL, yBot);
-    }
-
-    // Fenêtres de cabine (zone cabine = entre Cav et Cav+cabL)
-    if (S.nbFen > 0) {
-      const margH = (S.fenSplit ? cabL/2 : cabL) * 0.05;
-      const wFen  = S.wFen || 18;
-      const hFen  = S.hFen || 14;
-      const yFenMm= py + H * (S.yFen || 25) / 100;
-      const totalFenW = wFen * S.nbFen + (S.nbFen - 1) * 6;
-      const startX = px + Cav + (cabL - totalFenW) / 2;
-      for (let i = 0; i < S.nbFen; i++) {
-        const fx = startX + i * (wFen + 6);
-        if (fx >= px + Cav && fx + wFen <= px + Cav + cabL) {
-          cutRect(fx, yFenMm, wFen, hFen, S.radiusFen || 2);
-        }
-      }
+      foldLine(px+Cav,      yCap, px+Cav,      yBot);
+      foldLine(px+Cav+cabL, yCap, px+Cav+cabL, yBot);
     }
 
     // Grilles côtés capots
     if (S.showGrillesCotes) {
-      drawGrilleMarZone(px + 4, py + (H - Hcap) + 3, Cav - 8, Hcap - 6);
-      drawGrilleMarZone(px + Cav + cabL + 4, py + (H - Hcap) + 3, Car - 8, Hcap - 6);
+      drawGrilleMarZone(px + 4, yCap + 3, Cav - 8, Hcap - 6);
+      drawGrilleMarZone(px + Cav + cabL + 4, yCap + 3, Car - 8, Hcap - 6);
     }
+    // Grille déco générique (système flancs principaux : section GRI)
+    drawGrille(px, yCap, L, Hcap);
+    // Encoches bogies (option commune avec les autres modes)
+    drawBogieEncoches(px, yCap, L, Hcap, false);
+  }
+
+  // Helper : pièce flanc cabine séparée (rectangle longueurCabine × hauteurCabine)
+  const HcabFlanc = S.cabineHauteur || 25;  // hauteur des flancs cabine (slider dédié)
+  function drawFlancCabineMar(px, py, label_) {
+    rrect(px, py, cabL, HcabFlanc, 0, 'none', CUT, 1.5);
+    label(px+2, py+2, label_, 7);
+    if (S.showCotes) {
+      cote(px-4, py, px-4, py+HcabFlanc, HcabFlanc+'mm', -4);
+    }
+    // Fenêtres et portes : utiliser les fonctions existantes (système flanc principal)
+    // mais sur la zone cabine de dimensions cabL × HcabFlanc
+    drawFenetres(px, py, cabL, HcabFlanc);
+    drawPortes(px, py, cabL, HcabFlanc);
   }
 
   drawFlancMar(flancGX, flancY, 'FLANC G');
   drawFlancMar(flancDX, flancY, 'FLANC D');
 
+  // Pièces FLANC CABINE séparées, à droite des flancs capots
+  const flancCabGX = flancDX + L + GAP*2;
+  const flancCabDX = flancCabGX + cabL + GAP;
+  drawFlancCabineMar(flancCabGX, flancY, 'FLANC G CABINE');
+  drawFlancCabineMar(flancCabDX, flancY, 'FLANC D CABINE');
+
   if (S.showCotes) {
-    cote(flancGX, flancY - 4, flancGX + L, flancY - 4, L+'mm', -4);
-    cote(flancGX - 6, flancY, flancGX - 6, flancY + H, H+'mm cab', -4);
-    cote(flancGX, flancY + H + 4, flancGX + Cav, flancY + H + 4, Cav+'mm', 4);
-    cote(flancGX + Cav, flancY + H + 4, flancGX + Cav + cabL, flancY + H + 4, cabL+'mm', 4);
-    cote(flancGX + Cav + cabL, flancY + H + 4, flancGX + L, flancY + H + 4, Car+'mm', 4);
+    cote(flancGX, flancY + (H - Hcap) - 4, flancGX + L, flancY + (H - Hcap) - 4, L+'mm', -4);
+    cote(flancGX - 6, flancY + (H - Hcap), flancGX - 6, flancY + H, Hcap+'mm capot', -4);
   }
 
   // ── Rangée 2 : Plancher + Toit + Faces (avant, arrière, cabine) ──
   const r2y = flancY + H + GAP*3;
 
-  // Plancher (rectangle largeur × longueur)
+  // Plancher : largeur = S.cabineLargeur (slider dédié)
+  // Si plancherAvantReduit : silhouette en U (rétrécissement de la zone capot avant)
   const planchX = MARGIN;
   const planchY = r2y;
-  rrect(planchX, planchY, L, W - 2*ep, 0, 'none', CUT, 1.5);
+  const Wp = (S.cabineLargeur || 60) - 2*ep;  // largeur plancher (intérieure)
+  if (S.plancherAvantReduit) {
+    // Largeur réduite zone avant : applique sur toute la longueur Cav
+    const Wp2 = Wp * (S.plancherAvantPct || 60) / 100;  // largeur de la zone avant rétrécie
+    const off = (Wp - Wp2) / 2;  // décalage symétrique
+    const bis = Math.min(S.plancherAvantBis || 0, off, Cav * 0.4);  // biseau
+
+    // Silhouette en U : zone avant (Cav) plus étroite, zone cabine + arrière pleine largeur
+    let path = `M${planchX*SC},${(planchY + off)*SC}` +              // haut-gauche zone avant
+               ` L${(planchX + Cav - bis)*SC},${(planchY + off)*SC}`; // bord supérieur zone avant
+    if (bis > 0.3) {
+      // Biseau de l'angle haut interne
+      path += ` L${(planchX + Cav)*SC},${(planchY + off - bis)*SC}`;
+    }
+    path +=    ` L${(planchX + Cav)*SC},${planchY*SC}` +              // remonte au bord du haut
+               ` L${(planchX + L)*SC},${planchY*SC}` +                 // bord du haut zone arrière
+               ` L${(planchX + L)*SC},${(planchY + Wp)*SC}` +          // descend bord droit
+               ` L${(planchX + Cav)*SC},${(planchY + Wp)*SC}`;         // bord du bas zone arrière
+    if (bis > 0.3) {
+      // Biseau de l'angle bas interne
+      path += ` L${(planchX + Cav)*SC},${(planchY + Wp - off + bis)*SC}` +
+              ` L${(planchX + Cav - bis)*SC},${(planchY + Wp - off)*SC}`;
+    } else {
+      path += ` L${(planchX + Cav)*SC},${(planchY + Wp - off)*SC}`;
+    }
+    path +=    ` L${planchX*SC},${(planchY + Wp - off)*SC}` +         // bord du bas zone avant
+               ` Z`;
+    draw.path(path).fill('none').stroke({color:CUT, width:1.5});
+  } else {
+    rrect(planchX, planchY, L, Wp, 0, 'none', CUT, 1.5);
+  }
   label(planchX+2, planchY+2, 'PLANCHER', 7);
   if (S.showCotes) {
     cote(planchX, planchY - 4, planchX + L, planchY - 4, L+'mm', -4);
-    cote(planchX - 6, planchY, planchX - 6, planchY + W - 2*ep, (W-2*ep)+'mm', -4);
+    cote(planchX - 6, planchY, planchX - 6, planchY + Wp, Wp+'mm', -4);
   }
   // Marques de pli aux jonctions capot/cabine
   if (S.showFold) {
-    foldLine(planchX + Cav,      planchY, planchX + Cav,      planchY + W - 2*ep);
-    foldLine(planchX + Cav+cabL, planchY, planchX + Cav+cabL, planchY + W - 2*ep);
+    foldLine(planchX + Cav,      planchY, planchX + Cav,      planchY + Wp);
+    foldLine(planchX + Cav+cabL, planchY, planchX + Cav+cabL, planchY + Wp);
   }
 
   // Toit (largeur × longueur, comme le plancher)
@@ -6405,6 +6930,34 @@ function drawPatronMarchandise() {
     foldLine(toitX + Cav,      toitY, toitX + Cav,      toitY + W - 2*ep);
     foldLine(toitX + Cav+cabL, toitY, toitX + Cav+cabL, toitY + W - 2*ep);
   }
+
+  // Équipements sur le toit (sections EQU A/B/C, zone 'toit')
+  ['A', 'B', 'C'].forEach(k => {
+    if (!S['showEquip' + k]) return;
+    const cfg = {
+      forme: S['equip' + k + 'Forme'] || 'rect',
+      L:     S['equip' + k + 'L']     || 40,
+      W:     S['equip' + k + 'W']     || 25,
+      H:     S['equip' + k + 'H']     || 10,
+      bL:    S['equip' + k + 'BL']    || 0,
+      bW:    S['equip' + k + 'BW']    || 0,
+      r:     S['equip' + k + 'R']     || 2,
+      nb:    S['equip' + k + 'Nb']    || 1,
+      posX:  S['equip' + k + 'X']     || 50,
+      grille: S['equip' + k + 'Grille'] || false,
+      gW:    S['equip' + k + 'GW']    || 5,
+      gH:    S['equip' + k + 'GH']    || 5,
+      gT:    S['equip' + k + 'GT']    || 0.5,
+      gM:    S['equip' + k + 'GM']    || 2,
+      bisLong:      S['equip' + k + 'BisLong']      || false,
+      bisLongAngle: S['equip' + k + 'BisLongAngle'] || 15,
+      toitEpouse:   S['equip' + k + 'ToitEpouse']   || false,
+      zone:  S['equip' + k + 'Zone'] || 'toit'
+    };
+    if (cfg.zone === 'toit') {
+      drawEquipSurToit(toitX, toitY, L, W - 2*ep, cfg);
+    }
+  });
 
   // ── Rangée 3 : Faces (avant + arrière + dessus capots avant/arrière + dessus cabine) ──
   const r3y = r2y + (W - 2*ep) + GAP*3;
@@ -6448,35 +7001,315 @@ function drawPatronMarchandise() {
   label(r3x+2, r3y+2, 'DESSUS CAPOT AR', 7);
   r3x += Car + GAP*2;
 
-  // ── Rangée 4 : Cabine (4 faces dépliées : avant cabine + arrière cabine + dessus cabine) ──
+  // ── Rangée 4 : Cabine (faces verticales av/ar de la cabine + dessus cabine) ──
+  // Largeur cabine = S.cabineLargeur (slider dédié, indépendant de S.largeur)
+  // Hauteur cabine = S.cabineHauteur (slider dédié)
   const r4y = r3y + Math.max(faceAvH, W - 2*ep) + GAP*3;
   let r4x = MARGIN;
+  const cabW    = S.cabineLargeur || 60;
+  const cabH    = S.cabineHauteur || 25;
 
-  // Faces verticales de la cabine (avant + arrière) — pleines hauteurs
-  rrect(r4x, r4y, W, H, 0, 'none', CUT, 1.5);
-  label(r4x+2, r4y+2, 'FACE AV CABINE', 7);
-  // Fenêtre cabine avant (1 fenêtre centrale)
-  if (S.nbFen > 0) {
-    const fw = (S.wFen || 18) * 1.5, fh = (S.hFen || 14);
-    const fx = r4x + (W - fw) / 2;
-    const fy = r4y + H * (S.yFen || 25) / 100;
-    cutRect(fx, fy, fw, fh, S.radiusFen || 2);
-  }
-  r4x += W + GAP*2;
+  // Encoche en bas : dimension = min(S.largeur, cabW) × Hcap (limitée à la pièce)
+  const encW = Math.min(S.largeur, cabW);
+  const encH = Math.min(Hcap, cabH - 1);
+  const encX_off = (cabW - encW) / 2; // centrée horizontalement
 
-  rrect(r4x, r4y, W, H, 0, 'none', CUT, 1.5);
-  label(r4x+2, r4y+2, 'FACE AR CABINE', 7);
-  if (S.nbFen > 0) {
-    const fw = (S.wFen || 18) * 1.5, fh = (S.hFen || 14);
-    const fx = r4x + (W - fw) / 2;
-    const fy = r4y + H * (S.yFen || 25) / 100;
-    cutRect(fx, fy, fw, fh, S.radiusFen || 2);
+  // Path de la face cabine avec encoche en bas (silhouette en U inversé)
+  // et forme du haut paramétrable (plat / arrondis / biseaux / arc)
+  function drawFaceCabineMar(px, py, lbl) {
+    const forme = S.cabineHautForme || 'plat';
+    const R     = Math.min(S.cabineHautR || 0, cabH * 0.9, cabW / 2 - 1);
+    const B     = Math.min(S.cabineHautB || 0, cabH * 0.9, cabW / 2 - 1);
+    const sag   = Math.min(S.cabineHautArc || 0, cabH * 0.9, cabW / 2 - 0.5);
+
+    let pathTop;
+    if (forme === 'arrondis' && R > 0.5) {
+      const r = R * SC;
+      pathTop =
+        `M${px*SC},${(py+R)*SC}` +                                 // bord gauche au-dessous du coin
+        ` A${r},${r} 0 0,1 ${(px+R)*SC},${py*SC}` +                // coin gauche arrondi
+        ` L${(px+cabW-R)*SC},${py*SC}` +                           // ligne du haut
+        ` A${r},${r} 0 0,1 ${(px+cabW)*SC},${(py+R)*SC}`;          // coin droit arrondi
+    } else if (forme === 'biseaux' && B > 0.5) {
+      pathTop =
+        `M${px*SC},${(py+B)*SC}` +                                 // bord gauche au-dessous du chamfer
+        ` L${(px+B)*SC},${py*SC}` +                                // chamfer gauche
+        ` L${(px+cabW-B)*SC},${py*SC}` +                           // ligne du haut
+        ` L${(px+cabW)*SC},${(py+B)*SC}`;                          // chamfer droit
+    } else if (forme === 'arc' && sag > 0.5) {
+      const Rb  = (cabW*cabW/4 + sag*sag) / (2*sag);
+      const Rpx = Rb * SC;
+      pathTop =
+        `M${px*SC},${(py+sag)*SC}` +
+        ` A${Rpx},${Rpx} 0 0,1 ${(px+cabW)*SC},${(py+sag)*SC}`;    // arc convexe vers le haut
+    } else {
+      // plat
+      pathTop =
+        `M${px*SC},${py*SC}` +
+        ` L${(px+cabW)*SC},${py*SC}`;
+    }
+
+    const path =
+      pathTop +
+      ` L${(px+cabW)*SC},${(py+cabH)*SC}` +               // bas-droit
+      ` L${(px+encX_off+encW)*SC},${(py+cabH)*SC}` +      // bord droit de l'encoche (en bas)
+      ` L${(px+encX_off+encW)*SC},${(py+cabH-encH)*SC}` + // remonte dans l'encoche
+      ` L${(px+encX_off)*SC},${(py+cabH-encH)*SC}` +      // traverse l'encoche
+      ` L${(px+encX_off)*SC},${(py+cabH)*SC}` +           // redescend
+      ` L${px*SC},${(py+cabH)*SC}` +                      // bord bas-gauche
+      ` Z`;
+    draw.path(path).fill('none').stroke({color:CUT, width:1.5});
+    label(px+2, py+2, lbl, 7);
+    if (S.showCotes) {
+      cote(px, py, px+cabW, py, cabW+'mm', -4);
+      cote(px-4, py, px-4, py+cabH, cabH+'mm', -4);
+    }
+    // Fenêtres de conduite via le système existant
+    if (S.showFenCabine) {
+      drawFenCabine(px, py, cabW, cabH);
+    }
   }
-  r4x += W + GAP*2;
+
+  drawFaceCabineMar(r4x, r4y, 'FACE AV CABINE');
+  r4x += cabW + GAP*2;
+
+  drawFaceCabineMar(r4x, r4y, 'FACE AR CABINE');
+  r4x += cabW + GAP*2;
 
   // Dessus cabine
-  rrect(r4x, r4y, cabL, W - 2*ep, 0, 'none', CUT, 1.5);
+  // Hauteur = développé du contour supérieur de la FACE cabine selon la forme du haut
+  // Largeur = cabL + 2*débord (symétrique)
+  const dessusDebord = S.cabineDessusDebord || 0;
+  let dessusH = cabW; // par défaut (plat)
+  const formeH = S.cabineHautForme || 'plat';
+  const Rh = Math.min(S.cabineHautR || 0, cabH * 0.9, cabW / 2 - 1);
+  const Bh = Math.min(S.cabineHautB || 0, cabH * 0.9, cabW / 2 - 1);
+  const sagH = Math.min(S.cabineHautArc || 0, cabH * 0.9, cabW / 2 - 0.5);
+  if (formeH === 'arrondis' && Rh > 0.5) {
+    // 2 quarts d'arc + segment central plat
+    dessusH = (cabW - 2*Rh) + Math.PI * Rh; // 2 × (πR/2) = πR
+  } else if (formeH === 'biseaux' && Bh > 0.5) {
+    // 2 chamfers (sqrt 2 × B chacun) + segment central
+    dessusH = (cabW - 2*Bh) + 2 * Bh * Math.sqrt(2);
+  } else if (formeH === 'arc' && sagH > 0.5) {
+    // Longueur d'arc : R = (W²/4 + sag²) / (2 sag), longueur = 2R × asin(W / (2R))
+    const Rarc = (cabW*cabW/4 + sagH*sagH) / (2*sagH);
+    dessusH = 2 * Rarc * Math.asin(cabW / (2*Rarc));
+  }
+  dessusH = Math.round(dessusH * 10) / 10;
+  // Débord ajouté à la hauteur (= dimension correspondant au périmètre du contour haut)
+  dessusH = Math.round((dessusH + 2 * dessusDebord) * 10) / 10;
+  const dessusW = cabL;
+  rrect(r4x, r4y, dessusW, dessusH, 0, 'none', CUT, 1.5);
   label(r4x+2, r4y+2, 'DESSUS CABINE', 7);
+  if (S.showCotes) {
+    cote(r4x, r4y - 4, r4x + dessusW, r4y - 4, dessusW+'mm', -4);
+    cote(r4x - 4, r4y, r4x - 4, r4y + dessusH, dessusH+'mm', -4);
+  }
+  r4x += dessusW + GAP*2;
+
+  // Tampons (pièces séparées si activé) — après DESSUS CABINE
+  if (S.showTampons) {
+    drawTampons(r4x, r4y);
+    // Décaler r4x pour les auvents éventuels (estimation : 2 tampons côte à côte)
+    r4x += 80; // approximation pour la suite
+  }
+  // Auvents (pièces séparées si activé)
+  if (S.showAuvent && S.showFenCabine) {
+    const ar = drawAuvents(r4x, r4y);
+    r4x += ar.w + GAP*2;
+  }
+
+  // ── Rangée Relief (sous-couches) ──
+  // Reproduire les pièces avec fenêtres/portes mises à l'échelle reliefScale
+  // Pièces concernées : Flanc G/D Cabine, Face AV/AR Cabine
+  if (S.showRelief) {
+    const sc2  = S.reliefScale / 100;
+    const offY = S.reliefOffsetY || 0;
+
+    const rRelY = r4y + Math.max(cabH, dessusH, HcabFlanc) + GAP*4;
+    let rRelX = MARGIN;
+    label(rRelX, rRelY - 8, '── SOUS-COUCHES RELIEF ──', 7, RELIEF);
+
+    // Helper : dessine un relief plat avec fenêtres/portes mises à l'échelle
+    function drawReliefMarPiece(px, py, w, h, fenList, lbl) {
+      rrect(px, py, w, h, 0, '#f5f0e8', RELIEF, 1);
+      label(px+2, py+2, lbl, 7, RELIEF);
+      // Fenêtres en relief
+      fenList.forEach(f => {
+        if (f.type === 'rect') {
+          const rw = f.w * sc2, rh = f.h * sc2;
+          const rx = f.cx - rw/2, ry = f.cy - rh/2 + offY;
+          if (rx >= px && ry >= py && rx + rw <= px + w && ry + rh <= py + h) {
+            draw.rect(rw*SC, rh*SC).radius((f.r||0)*sc2*SC).move(rx*SC, ry*SC)
+              .fill('none').stroke({color:RELIEF, width:1});
+          }
+        } else if (f.type === 'circle') {
+          const r2 = f.r * sc2;
+          if (f.cx - r2 >= px && f.cy - r2 >= py && f.cx + r2 <= px + w && f.cy + r2 <= py + h) {
+            draw.circle(r2*2*SC).center(f.cx*SC, (f.cy + offY)*SC)
+              .fill('none').stroke({color:RELIEF, width:1});
+          }
+        }
+      });
+    }
+
+    // Liste fenêtres + portes à reproduire pour les FLANCS CABINE
+    function flancCabineFenList(px, py) {
+      const out = [];
+      // Fenêtres flanc cabine (système flancs principaux : nbFen, wFen, hFen, yFen)
+      // Note : drawFenetres dispose les fenêtres dans la zone — on simule la même logique
+      const nb = S.nbFen || 0;
+      if (nb > 0) {
+        const margin = 4;
+        const zoneW = cabL - 2*margin;
+        const step = nb > 1 ? (zoneW - S.wFen) / (nb - 1) : 0;
+        const totalGroupW = step * (nb - 1) + S.wFen;
+        const startX = px + margin + (zoneW - totalGroupW) / 2;
+        const fy = py + HcabFlanc * S.yFen / 100;
+        for (let i = 0; i < nb; i++) {
+          const fx = startX + i * step;
+          out.push({
+            type: 'rect', cx: fx + S.wFen/2, cy: fy + S.hFen/2,
+            w: S.wFen, h: S.hFen, r: S.radiusFen
+          });
+        }
+        // Étage 2 si activé
+        if (S.fenEtage) {
+          const fy2 = py + HcabFlanc * (S.yFen2 || 60) / 100;
+          const xOffsetMm = (((S.xFen2 || 50) - 50) / 100) * step;
+          const startX2 = startX + xOffsetMm;
+          const fh2 = S.hFen2 || 12;
+          for (let i = 0; i < nb; i++) {
+            const fx = startX2 + i * step;
+            out.push({
+              type: 'rect', cx: fx + S.wFen/2, cy: fy2 + fh2/2,
+              w: S.wFen, h: fh2, r: S.radiusFen
+            });
+          }
+        }
+      }
+      // Portes (jusqu'à 3)
+      const nbP = parseInt(S.nbPortes) || 0;
+      const posSliders = [S.portePosX, S.portePosX2, S.portePosX3];
+      const wPortes = [S.wPorte1 || 18, S.wPorte2 || 18, S.wPorte3 || 18];
+      for (let pi = 0; pi < nbP; pi++) {
+        const wP = Math.min(wPortes[pi], cabL * 0.4);
+        const cxP = px + 4 + wP/2 + (cabL - 8 - wP) * posSliders[pi] / 100;
+        const hP = HcabFlanc - 6;  // approximation
+        out.push({
+          type: 'rect', cx: cxP, cy: py + 3 + hP/2,
+          w: wP, h: hP, r: 1
+        });
+      }
+      return out;
+    }
+
+    // Liste fenêtres pour FACE AV/AR CABINE (drawFenCabine = 2 fenêtres)
+    function faceCabineFenList(px, py) {
+      const out = [];
+      if (!S.showFenCabine) return out;
+      const ratio = (S.fenCabineRatio !== undefined ? S.fenCabineRatio : 50) / 100;
+      const totalFW = S.fenCabineW * 2;
+      const fw1 = totalFW * (1 - ratio);
+      const fw2 = totalFW * ratio;
+      const fh  = S.fenCabineH;
+      const marg = S.fenCabineMarg;
+      const yc  = py + cabH * (S.fenCabineY || 30) / 100;
+      const xLeft  = px + marg;
+      const xRight = px + cabW - marg - fw2;
+      if (S.fenCabineForme === 'cercle') {
+        out.push({ type: 'circle', cx: xLeft + fw1/2, cy: yc + fh/2, r: Math.min(fw1, fh)/2 });
+        out.push({ type: 'circle', cx: xRight + fw2/2, cy: yc + fh/2, r: Math.min(fw2, fh)/2 });
+      } else {
+        out.push({ type: 'rect', cx: xLeft + fw1/2, cy: yc + fh/2, w: fw1, h: fh, r: S.fenCabineR });
+        out.push({ type: 'rect', cx: xRight + fw2/2, cy: yc + fh/2, w: fw2, h: fh, r: S.fenCabineR });
+      }
+      return out;
+    }
+
+    // Pièces relief : 2 flancs cabine + 2 faces cabine
+    drawReliefMarPiece(rRelX, rRelY, cabL, HcabFlanc, flancCabineFenList(rRelX, rRelY), 'RELIEF FLANC G CAB');
+    rRelX += cabL + GAP*2;
+    drawReliefMarPiece(rRelX, rRelY, cabL, HcabFlanc, flancCabineFenList(rRelX, rRelY), 'RELIEF FLANC D CAB');
+    rRelX += cabL + GAP*2;
+    drawReliefMarPiece(rRelX, rRelY, cabW, cabH, faceCabineFenList(rRelX, rRelY), 'RELIEF FACE AV CAB');
+    rRelX += cabW + GAP*2;
+    drawReliefMarPiece(rRelX, rRelY, cabW, cabH, faceCabineFenList(rRelX, rRelY), 'RELIEF FACE AR CAB');
+  }
+
+  // ── Rangée 5 : Cabine débordante (4 pièces qui se collent par-dessus) ──
+  if (S.showCabineDebord) {
+    const cdW   = S.cabineDebordW || 70;          // largeur cabine débordante
+    const cdH   = S.cabineDebordH || 15;          // hauteur de la zone de débord
+    const cdBis = Math.min(S.cabineDebordBiseau || 0, cdH * 0.9, cdW / 2 - 5); // biseau
+
+    const r5y = r4y + Math.max(H, W - 2*ep) + GAP*4;
+    let r5x = MARGIN;
+
+    label(r5x, r5y - 8, '── CABINE DÉBORDANTE (collée par-dessus) ──', 7);
+
+    // Pièce 1 : Flanc G de la cabine débordante (silhouette = trapèze avec 2 biseaux haut)
+    // Largeur = cabL (longueur de la cabine), hauteur = cdH (zone de débord)
+    // Bord du haut : peut être biseauté aux 2 extrémités si cdBis > 0
+    function drawCabineDebordFlanc(px, py, lbl) {
+      const path = cdBis > 0
+        ? `M${px*SC},${(py+cdH)*SC}` +
+          ` L${px*SC},${(py+cdBis)*SC}` +
+          ` L${(px+cdBis)*SC},${py*SC}` +
+          ` L${(px+cabL-cdBis)*SC},${py*SC}` +
+          ` L${(px+cabL)*SC},${(py+cdBis)*SC}` +
+          ` L${(px+cabL)*SC},${(py+cdH)*SC} Z`
+        : `M${px*SC},${py*SC} L${(px+cabL)*SC},${py*SC} L${(px+cabL)*SC},${(py+cdH)*SC} L${px*SC},${(py+cdH)*SC} Z`;
+      draw.path(path).fill('none').stroke({color:CUT, width:1.5});
+      label(px+2, py+2, lbl, 7);
+    }
+
+    drawCabineDebordFlanc(r5x, r5y, 'CAB-DEB FLANC G');
+    if (S.showCotes) cote(r5x, r5y + cdH + 2, r5x + cabL, r5y + cdH + 2, cabL+'mm', 4);
+    if (S.showCotes) cote(r5x - 4, r5y, r5x - 4, r5y + cdH, cdH+'mm', -4);
+    r5x += cabL + GAP*2;
+
+    drawCabineDebordFlanc(r5x, r5y, 'CAB-DEB FLANC D');
+    r5x += cabL + GAP*2;
+
+    // Pièce 2 : Face avant + arrière (largeur = cdW)
+    // Forme = même profil avec biseaux
+    function drawCabineDebordFace(px, py, lbl) {
+      const path = cdBis > 0
+        ? `M${px*SC},${(py+cdH)*SC}` +
+          ` L${px*SC},${(py+cdBis)*SC}` +
+          ` L${(px+cdBis)*SC},${py*SC}` +
+          ` L${(px+cdW-cdBis)*SC},${py*SC}` +
+          ` L${(px+cdW)*SC},${(py+cdBis)*SC}` +
+          ` L${(px+cdW)*SC},${(py+cdH)*SC} Z`
+        : `M${px*SC},${py*SC} L${(px+cdW)*SC},${py*SC} L${(px+cdW)*SC},${(py+cdH)*SC} L${px*SC},${(py+cdH)*SC} Z`;
+      draw.path(path).fill('none').stroke({color:CUT, width:1.5});
+      label(px+2, py+2, lbl, 7);
+    }
+
+    drawCabineDebordFace(r5x, r5y, 'CAB-DEB FACE AV');
+    if (S.showCotes) cote(r5x, r5y + cdH + 2, r5x + cdW, r5y + cdH + 2, cdW+'mm', 4);
+    r5x += cdW + GAP*2;
+
+    drawCabineDebordFace(r5x, r5y, 'CAB-DEB FACE AR');
+    r5x += cdW + GAP*2;
+
+    // Pièce 3 : Dessus de la cabine débordante (rectangle cabL × cdW)
+    // Si biseaux : la longueur effective du dessus est cabL - 2*cdBis (la partie plate du haut)
+    // Pour simplifier on garde cabL et on indique le biseau via marques de pli aux 2 extrémités
+    rrect(r5x, r5y, cabL, cdW, 0, 'none', CUT, 1.5);
+    label(r5x+2, r5y+2, 'DESSUS CAB-DEB', 7);
+    if (S.showCotes) {
+      cote(r5x, r5y + cdW + 2, r5x + cabL, r5y + cdW + 2, cabL+'mm', 4);
+      cote(r5x - 4, r5y, r5x - 4, r5y + cdW, cdW+'mm', -4);
+    }
+    if (cdBis > 0 && S.showFold) {
+      // Marques de pli pour les biseaux (lignes verticales aux 2 extrémités du dessus)
+      foldLine(r5x + cdBis,        r5y, r5x + cdBis,        r5y + cdW);
+      foldLine(r5x + cabL - cdBis, r5y, r5x + cabL - cdBis, r5y + cdW);
+    }
+  }
 }
 
 // Helper : dessine une grille de cellules dans une zone
@@ -8248,6 +9081,12 @@ function drawPatron() {
       r4x += nbT * (tamW + GAP);
     }
 
+    // Auvents
+    if (S.showAuvent && S.showFenCabine) {
+      const ar = drawAuvents(r4x, r4y);
+      r4x += ar.w + GAP*2;
+    }
+
     // Couloir d'interconnexion
     if (S.showCouloir) {
       drawCouloir(r4x, r4y);
@@ -8564,6 +9403,12 @@ function syncUIFromState() {
   _el('sec-phares').style.display       = (isLoco || isMar) ? 'block' : 'none';
   const _secMar = _el('sec-marchandise');
   if (_secMar) _secMar.style.display    = isMar ? 'block' : 'none';
+  const _fCab = _el('f-cabineCentraleL');
+  if (_fCab) _fCab.style.display        = isMar ? 'block' : 'none';
+  const _fCabX = _el('f-cabineCentraleX');
+  if (_fCabX) _fCabX.style.display      = isMar ? 'block' : 'none';
+  const _btnMar = _el('btn-nav-mar');
+  if (_btnMar) _btnMar.style.display    = isMar ? '' : 'none';
   // Relief
   _el('relief-opts').style.display = S.showRelief ? 'block' : 'none';
   _el('relief-portes-opts').style.display = S.showRelief ? 'block' : 'none';
@@ -8825,9 +9670,14 @@ function openBiaisEditor() {
     _biaisPts = new Array(_bNb).fill(0);
   }
 
-  _setupBiaisCanvas();
-  _setupBiaisEvents();
-  renderBiaisCanvas();
+  // Différer le calcul des dimensions le temps que le layout du modal soit appliqué
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      _setupBiaisCanvas();
+      _setupBiaisEvents();
+      renderBiaisCanvas();
+    });
+  });
 }
 
 function _setupBiaisCanvas() {
@@ -9269,8 +10119,13 @@ function openNezEditor() {
   const btnm = document.getElementById('btn-img-move');
   if (btnm) { btnm.style.background = '#fff9f0'; btnm.style.color = ''; }
   nezEditor.zoom = { scale: 1, tx: 0, ty: 0 };  // reset zoom
-  resizeNezCanvas();
-  renderNezEditor();
+  // Différer pour que le layout du modal soit calculé avant le resize du canvas
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      resizeNezCanvas();
+      renderNezEditor();
+    });
+  });
 
   c.addEventListener('click',     nezOnClick);
   c.addEventListener('dblclick',  nezOnDblClick);
@@ -10037,8 +10892,12 @@ function fixPanelHeight() {
   else document.body.classList.remove('mobile-device');
   const headerEl = document.querySelector('header');
   const navEl = document.getElementById('panel-nav');
-  const topOffset = (headerEl ? headerEl.offsetHeight : 44) + (navEl ? navEl.offsetHeight : 44);
-  const h = window.innerHeight - topOffset;
+  const headerH = headerEl ? headerEl.offsetHeight : 44;
+  const navH    = navEl ? navEl.offsetHeight : 44;
+  // Sur mobile, panel-nav est en bas (CSS: bottom:0) → ne pas l'inclure dans le top
+  const topOffset = _isMobile ? headerH : (headerH + navH);
+  // Sur mobile, retirer aussi la hauteur du nav (en bas) du calcul de height
+  const h = _isMobile ? (window.innerHeight - headerH - navH) : (window.innerHeight - topOffset);
   const panel = document.getElementById('panel');
   if (panel) {
     panel.style.setProperty('top', topOffset + 'px', 'important');
