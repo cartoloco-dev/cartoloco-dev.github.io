@@ -5560,8 +5560,19 @@ function drawEquipNet(px, py, k, cfg) {
       const gW2 = S['equip'+k+'GW']||5, gH2 = S['equip'+k+'GH']||5;
       const gt2 = S['equip'+k+'GT']||0.5, gm2 = S['equip'+k+'GM']||2;
       const gx0=ox2+bev+gm2, gx1=ox2+L-bev-gm2, gy0=oy2+gm2, gy1=oy2+W-gm2;
-      for (let xx=gx0; xx<=gx1; xx+=gW2) draw.line(xx*sc,gy0*sc,xx*sc,gy1*sc).stroke({color:CUT,width:gt2});
-      for (let yy=gy0; yy<=gy1; yy+=gH2) draw.line(gx0*sc,yy*sc,gx1*sc,yy*sc).stroke({color:CUT,width:gt2});
+      // Verticales : toutes (bord G inclus, dernière clampée à gx1)
+      let xx2 = gx0;
+      while (xx2 <= gx1 + 0.01) {
+        draw.line(xx2*sc,gy0*sc,xx2*sc,gy1*sc).stroke({color:CUT,width:gt2});
+        xx2 += gW2;
+      }
+      if (Math.abs(xx2 - gW2 - gx1) > 0.5) {
+        draw.line(gx1*sc,gy0*sc,gx1*sc,gy1*sc).stroke({color:CUT,width:gt2});
+      }
+      // Horizontales : intérieures uniquement
+      for (let yy=gy0+gH2; yy<gy1-0.01; yy+=gH2) {
+        draw.line(gx0*sc,yy*sc,gx1*sc,yy*sc).stroke({color:CUT,width:gt2});
+      }
     }
     return W + 30;
   }
@@ -5668,23 +5679,22 @@ function drawEquipNet(px, py, k, cfg) {
     const gW   = S['equip'+k+'GW'] || 5;
     const gH   = S['equip'+k+'GH'] || 5;
     const gt   = S['equip'+k+'GT'] || 0.5;
-    const gm   = S['equip'+k+'GM'] || 2;
-    const gx0  = ox + gm, gx1 = ox + fondL - gm;
-    const gy0  = oy + slantW + gm, gy1 = oy + slantW + fondW - gm;
-    // Lignes verticales (grille en bleu, sans doublon sur le bord droit)
-    let xx = gx0;
+    // Grille couvre toute la zone BASE (bord à bord) pour éviter doubles traits.
+    // gm n'est plus utilisé (la grille colle aux contours de la BASE)
+    const gx0  = ox, gx1 = ox + fondL;
+    const gy0  = oy + slantW, gy1 = oy + slantW + fondW;
+    // Verticales internes uniquement (les bords G/D sont déjà tracés par le contour CUT de la pièce)
+    let xx = gx0 + gW;
     while (xx < gx1 - 0.01) {
       draw.line(xx*sc, gy0*sc, xx*sc, gy1*sc).stroke({color:FOLD, width:gt});
       xx += gW;
     }
-    draw.line(gx1*sc, gy0*sc, gx1*sc, gy1*sc).stroke({color:FOLD, width:gt});
-    // Lignes horizontales (sans doublon sur le bord bas)
-    let yy = gy0;
+    // Horizontales internes uniquement (les bords haut/bas sont déjà tracés par les plis BASE↔CÔTÉ)
+    let yy = gy0 + gH;
     while (yy < gy1 - 0.01) {
       draw.line(gx0*sc, yy*sc, gx1*sc, yy*sc).stroke({color:FOLD, width:gt});
       yy += gH;
     }
-    draw.line(gx0*sc, gy1*sc, gx1*sc, gy1*sc).stroke({color:FOLD, width:gt});
   }
 
   // ── ÉPOUSE LE TOIT ──
@@ -6804,7 +6814,7 @@ function drawPatronMarchandise() {
   container.innerHTML = '';
   // Largeur estimée : 2 flancs capot + 2 flancs cabine + plancher + toit + capots latéraux
   const totalW = MARGIN + L*2 + cabL*2 + W*2 + GAP*8 + MARGIN + 60;
-  const totalH = MARGIN + H*2 + W + GAP*4 + 400;
+  const totalH = MARGIN + H*2 + W + GAP*4 + 600;
   draw = SVG().addTo('#svg-patron').size(totalW * SC, totalH * SC);
 
   if (S.showGrid) {
@@ -6875,46 +6885,82 @@ function drawPatronMarchandise() {
   // ── Rangée 2 : Plancher + Toit + Faces (avant, arrière, cabine) ──
   const r2y = flancY + H + GAP*3;
 
-  // Plancher : largeur = S.cabineLargeur (slider dédié)
-  // Si plancherAvantReduit : silhouette en U (rétrécissement de la zone capot avant)
+  // ── Plancher de la loco marchandise ──
+  // Construction selon la règle utilisateur :
+  // - Bord vertical gauche (rouge), hauteur = Wp (largeur cabine - 2ep)
+  // - Pour chaque bogie (du 1er au dernier de gauche à droite) :
+  //   * 2 horizontaux jusqu'à AVANT le bogie : x = pos×L − encW/2 − ep
+  //   * Vertical bleu (pli) reliant haut et bas
+  //   * 2 horizontaux d'avancement = bogieEncH (sens longueur)
+  //   * Vertical bleu
+  //   * 2 horizontaux de longueur (encW − 2ep)
+  //   * Vertical bleu
+  //   * 2 horizontaux d'avancement = bogieEncH
+  // - Pour le dernier bogie : 2 horizontaux jusqu'à L (bord droit)
+  // - Bord vertical droit (rouge) qui ferme le rectangle
+  //
+  // Les marques de pli (verticaux bleus) découpent le plancher en plusieurs zones
+  // qui correspondent aux pliures pour épouser les encoches.
   const planchX = MARGIN;
   const planchY = r2y;
-  const Wp = (S.cabineLargeur || 60) - 2*ep;  // largeur plancher (intérieure)
-  if (S.plancherAvantReduit) {
-    // Largeur réduite zone avant : applique sur toute la longueur Cav
-    const Wp2 = Wp * (S.plancherAvantPct || 60) / 100;  // largeur de la zone avant rétrécie
-    const off = (Wp - Wp2) / 2;  // décalage symétrique
-    const bis = Math.min(S.plancherAvantBis || 0, off, Cav * 0.4);  // biseau
+  const Wp = (S.cabineLargeur || 60) - 2*ep;  // largeur plancher (= largeur cabine - 2ep)
 
-    // Silhouette en U : zone avant (Cav) plus étroite, zone cabine + arrière pleine largeur
-    let path = `M${planchX*SC},${(planchY + off)*SC}` +              // haut-gauche zone avant
-               ` L${(planchX + Cav - bis)*SC},${(planchY + off)*SC}`; // bord supérieur zone avant
+  const bogiesActifs = S.showBogies && S.bogieEncoche && S.bogieEncH > 0;
+  const encHb = bogiesActifs ? S.bogieEncH : 0;
+  // Trier les bogies par position croissante
+  const bogieList = bogiesActifs ? [
+    { rx: S.bogiePos1/100, encW: S.bogieEncW  || 8 },
+    { rx: S.bogiePos2/100, encW: S.bogieEncW2 || 8 }
+  ].sort((a, b) => a.rx - b.rx) : [];
+
+  if (S.plancherAvantReduit && !bogiesActifs) {
+    // Cas U inversé classique (sans bogies) — comportement existant
+    const Wp2 = Wp * (S.plancherAvantPct || 60) / 100;
+    const off = (Wp - Wp2) / 2;
+    const bis = Math.min(S.plancherAvantBis || 0, off, Cav * 0.4);
+    let path = `M${planchX*SC},${(planchY + off)*SC}` +
+               ` L${(planchX + Cav - bis)*SC},${(planchY + off)*SC}`;
+    if (bis > 0.3) path += ` L${(planchX + Cav)*SC},${(planchY + off - bis)*SC}`;
+    path += ` L${(planchX + Cav)*SC},${planchY*SC}` +
+            ` L${(planchX + L)*SC},${planchY*SC}` +
+            ` L${(planchX + L)*SC},${(planchY + Wp)*SC}` +
+            ` L${(planchX + Cav)*SC},${(planchY + Wp)*SC}`;
     if (bis > 0.3) {
-      // Biseau de l'angle haut interne
-      path += ` L${(planchX + Cav)*SC},${(planchY + off - bis)*SC}`;
-    }
-    path +=    ` L${(planchX + Cav)*SC},${planchY*SC}` +              // remonte au bord du haut
-               ` L${(planchX + L)*SC},${planchY*SC}` +                 // bord du haut zone arrière
-               ` L${(planchX + L)*SC},${(planchY + Wp)*SC}` +          // descend bord droit
-               ` L${(planchX + Cav)*SC},${(planchY + Wp)*SC}`;         // bord du bas zone arrière
-    if (bis > 0.3) {
-      // Biseau de l'angle bas interne
       path += ` L${(planchX + Cav)*SC},${(planchY + Wp - off + bis)*SC}` +
               ` L${(planchX + Cav - bis)*SC},${(planchY + Wp - off)*SC}`;
     } else {
       path += ` L${(planchX + Cav)*SC},${(planchY + Wp - off)*SC}`;
     }
-    path +=    ` L${planchX*SC},${(planchY + Wp - off)*SC}` +         // bord du bas zone avant
-               ` Z`;
+    path += ` L${planchX*SC},${(planchY + Wp - off)*SC} Z`;
     draw.path(path).fill('none').stroke({color:CUT, width:1.5});
-  } else {
+  } else if (!bogiesActifs) {
+    // Cas rectangle simple
     rrect(planchX, planchY, L, Wp, 0, 'none', CUT, 1.5);
+  } else {
+    // Cas avec bogies : contour rectangulaire L × Wp + traits de pli verticaux internes
+    rrect(planchX, planchY, L, Wp, 0, 'none', CUT, 1.5);
+    // Pour chaque bogie : 4 traits de pli verticaux qui découpent les zones de pliage
+    if (S.showFold) {
+      bogieList.forEach(bg => {
+        const cx = planchX + bg.rx * L;
+        const x1 = cx - bg.encW/2 - ep;          // avant le bogie
+        const x2 = x1 + encHb;                    // après bande encH
+        const x3 = x2 + (bg.encW - 2*ep);         // après bande (encW - 2ep)
+        const x4 = x3 + encHb;                    // après bande encH (juste après le bogie)
+        [x1, x2, x3, x4].forEach(xv => {
+          if (xv > planchX && xv < planchX + L) {
+            foldLine(xv, planchY, xv, planchY + Wp);
+          }
+        });
+      });
+    }
   }
   label(planchX+2, planchY+2, 'PLANCHER', 7);
   if (S.showCotes) {
     cote(planchX, planchY - 4, planchX + L, planchY - 4, L+'mm', -4);
     cote(planchX - 6, planchY, planchX - 6, planchY + Wp, Wp+'mm', -4);
   }
+
   // Marques de pli aux jonctions capot/cabine
   if (S.showFold) {
     foldLine(planchX + Cav,      planchY, planchX + Cav,      planchY + Wp);
@@ -7236,6 +7282,32 @@ function drawPatronMarchandise() {
     drawReliefMarPiece(rRelX, rRelY, cabW, cabH, faceCabineFenList(rRelX, rRelY), 'RELIEF FACE AV CAB');
     rRelX += cabW + GAP*2;
     drawReliefMarPiece(rRelX, rRelY, cabW, cabH, faceCabineFenList(rRelX, rRelY), 'RELIEF FACE AR CAB');
+  }
+
+  // ── Rangée Équipements (pièces dépliées séparées à coller sur le toit) ──
+  const hasEquipMar = ['A','B','C'].some(k => S['showEquip' + k]);
+  if (hasEquipMar) {
+    // Y de la rangée : sous le relief si activé, sinon sous la rangée 4
+    const rEquipY = (S.showRelief)
+      ? r4y + Math.max(cabH, dessusH, HcabFlanc) + GAP*4 + Math.max(HcabFlanc, cabH) + GAP*4
+      : r4y + Math.max(cabH, dessusH, HcabFlanc) + GAP*4;
+    let rEquipX = MARGIN;
+    draw.text('— ÉQUIPEMENTS —')
+      .move(MARGIN*SC, (rEquipY - 10)*SC)
+      .font({family:'Syne,sans-serif', size:9, fill:'#6688cc'});
+    ['A','B','C'].forEach(k => {
+      const cfg = equipConfig(k);
+      if (!cfg.show) return;
+      for (let copy = 0; copy < cfg.nb; copy++) {
+        drawEquipNet(rEquipX, rEquipY, k, cfg);
+        const topL = Math.max(2, cfg.L - 2*cfg.H*Math.tan(cfg.bL));
+        const slantL = cfg.H / Math.cos(cfg.bL);
+        const pieceW = cfg.forme === 'cylindre'
+          ? Math.PI * cfg.W + cfg.W * 2 + 24
+          : topL + slantL + 6 + cfg.L + 16;
+        rEquipX += pieceW + GAP * 2;
+      }
+    });
   }
 
   // ── Rangée 5 : Cabine débordante (4 pièces qui se collent par-dessus) ──
@@ -7695,7 +7767,9 @@ function drawPatron() {
 
   } else if (S.nez === 'casse' || S.nez === 'custom') {
     const nezD = S.longueur * S.cabine / 100;
-    const biaisProfile = getBiaisProfileMm(S.largeur, nezD);
+    // Le profil biais (courbe custom du nez TGV) ne s'applique qu'en mode casse,
+    // pas en mode custom (où le nez est défini par customNezPoints, pas par le biais profile).
+    const biaisProfile = (S.nez === 'casse') ? getBiaisProfileMm(S.largeur, nezD) : null;
 
     if (biaisProfile && biaisProfile.length > 1) {
       const scale = planchLarg / S.largeur;
