@@ -179,9 +179,26 @@ header .sub{font-size:0.58rem;opacity:0.4;letter-spacing:0.1em;text-transform:up
   }
 .stepper { display:none; }
 
-.section{border-bottom:1px solid var(--border);padding:12px 16px;}
-.stitle{font-family:'Syne',sans-serif;font-weight:700;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:10px;}
-.field{margin-bottom:10px;}
+.section{
+  margin:14px 12px;
+  padding:14px 16px 16px;
+  background:rgba(255,249,240,0.6);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 1px 3px rgba(120,90,40,0.05), inset 0 0 0 1px rgba(255,255,255,0.4);
+  position:relative;
+}
+.section::before{
+  content:'';
+  position:absolute;
+  left:-1px; top:14px;
+  width:3px; height:24px;
+  background:var(--accent);
+  border-radius:0 2px 2px 0;
+  opacity:0.85;
+}
+.stitle{font-family:'Syne',sans-serif;font-weight:700;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:14px;}
+.field{margin-bottom:14px;}
 .field label{display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:5px;opacity:0.75;}
 .field label .val{font-weight:500;opacity:1;color:var(--text);}
 
@@ -414,14 +431,17 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
     -webkit-overflow-scrolling: touch;
   }
   
-/* Overlay */
+/* Overlay : visible mais transparent aux clics/touches pour permettre l'interaction
+   avec le canvas du patron derrière (zoom, déplacement). On peut fermer le drawer via
+   le handle, le bouton de nav, ou le swipe. */
 #mobile-drawer-overlay {
     display: none;
     position: fixed;
     inset: 0;
     bottom: 56px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.15);
     z-index: 499;
+    pointer-events: none;
   }
 #mobile-drawer-overlay.open { display: block; }
 
@@ -495,7 +515,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
     <div class="tri-group" data-label="Bases" style="--group-flex:7">
       <button onclick="navTo('sec-dims')"         class="tri-btn" title="Dimensions">DIM</button>
       <button onclick="navTo('sec-toit')"          class="tri-btn" title="Toit">TOI</button>
-      <button onclick="navTo('section-loco')"      class="tri-btn" title="Nez">NEZ</button>
+      <button onclick="navTo('section-loco')"      class="tri-btn" id="btn-nav-nez" title="Nez">NEZ</button>
       <button onclick="navTo('sec-fen')"           class="tri-btn" title="Fenêtres">FEN</button>
       <button onclick="navTo('sec-porte')"         class="tri-btn" title="Portes">POR</button>
       <button onclick="navTo('sec-phares')"        class="tri-btn" title="Phares">PHA</button>
@@ -650,6 +670,27 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
         <label>Arrondi (sag) <span class="val" id="v-rtgArrondi">20</span> mm</label>
         <input type="range" id="rtgArrondi" min="1" max="60" value="20" step="0.5">
       </div>
+      <div class="field">
+        <label>Hauteur départ inclinaison <span class="val" id="v-rtgHStart">0</span> mm</label>
+        <input type="range" id="rtgHStart" min="0" max="60" value="0" step="0.5">
+      </div>
+      <div class="field">
+        <label class="ckrow"><input type="checkbox" id="showDessousNez"> Pièce dessous nez (plancher du nez)</label>
+      </div>
+      <div id="dessous-nez-opts" style="display:none">
+        <div class="field">
+          <label>Profondeur dessous nez <span class="val" id="v-dessousNezH">10</span> mm</label>
+          <input type="range" id="dessousNezH" min="2" max="50" value="10" step="0.5">
+        </div>
+        <div class="field">
+          <label>Longueur dessous nez <span class="val" id="v-dessousNezL">100</span> mm</label>
+          <input type="range" id="dessousNezL" min="20" max="300" value="100" step="1">
+        </div>
+        <div class="field">
+          <label>Effilage <span class="val" id="v-dessousNezEffilage">0</span> %</label>
+          <input type="range" id="dessousNezEffilage" min="0" max="100" value="0" step="5">
+        </div>
+      </div>
     </div>
     <div id="biseau-jonction-opts" style="display:none">
       <div style="font-size:0.65rem;font-family:DM Mono,monospace;opacity:0.6;margin:10px 0 4px">BISEAU JONCTION NEZ/FACE</div>
@@ -680,16 +721,6 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <input type="range" id="nezRadius" min="0" max="30" value="0" step="0.5">
     </div>
     <div id="nez-casse-opts">
-    <!-- Préréglages courbe nez -->
-    <div style="font-size:0.65rem;font-family:DM Mono,monospace;opacity:0.6;margin:8px 0 4px">COURBE DU NEZ</div>
-    <div id="nez-preset-buttons" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
-      <button onclick="applyNezPreset('reset')"         style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#f0ece3;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">↩ Aucune</button>
-      <button onclick="applyNezPreset('ogive_douce')"    style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Ogive douce</button>
-      <button onclick="applyNezPreset('ogive_marquee')"  style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Ogive marquée</button>
-      <button onclick="applyNezPreset('elliptique')"     style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Elliptique</button>
-      <button onclick="applyNezPreset('parabolique')"    style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Parabolique</button>
-      <button onclick="applyNezPreset('droite')"         style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Droite</button>
-    </div>
       <label>Profil de la face</label>
       <div class="radio-group">
         <div class="rbtn active" data-g="nezFaceType" data-v="plat">Plat</div>
@@ -726,6 +757,14 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
 
     <div id="biais-section">
     <div style="font-size:0.65rem;font-family:DM Mono,monospace;opacity:0.6;margin:10px 0 4px">COURBURE DU NEZ (vue de dessus)</div>
+    <div id="nez-preset-buttons" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+      <button onclick="applyNezPreset('reset')"         style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#f0ece3;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">↩ Aucune</button>
+      <button onclick="applyNezPreset('ogive_douce')"    style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Ogive douce</button>
+      <button onclick="applyNezPreset('ogive_marquee')"  style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Ogive marquée</button>
+      <button onclick="applyNezPreset('elliptique')"     style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Elliptique</button>
+      <button onclick="applyNezPreset('parabolique')"    style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Parabolique</button>
+      <button onclick="applyNezPreset('droite')"         style="font-family:DM Mono,monospace;font-size:0.6rem;padding:4px 7px;background:#fff9f0;border:1px solid #c8bfaa;border-radius:5px;cursor:pointer">🔵 Droite</button>
+    </div>
     <button id="btn-editer-courbure" class="btn btn-blue" style="width:100%;padding:8px;font-size:0.72rem" onclick="openBiaisEditor()">Éditer la courbure du nez</button>
     <div id="biais-profile-info" style="font-size:0.6rem;font-family:DM Mono,monospace;opacity:0.6;margin-top:4px;display:none">Profil personnalisé actif</div>
     <div class="field" id="f-nezBiaisRainEsp" style="margin-top:6px">
@@ -745,9 +784,6 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
         <input type="range" id="nezTurboIncl" min="0" max="100" value="20" step="1">
       </div>
     </div>
-    <div class="field" id="f-bombage" style="display:none">
-      <label class="ckrow"><input type="checkbox" id="showBombage"> Bombage face avant (Nez EAD)</label>
-    </div>
     <div id="bombage-opts" style="display:none">
       <div class="field">
         <label>Sagitta (hauteur bombée) <span class="val" id="v-bombageSag">5</span> mm</label>
@@ -765,22 +801,13 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
         <input type="range" id="gabaritEp" min="5" max="60" value="20" step="1">
       </div>
     </div>
-    <div class="field" id="f-rJonctionToitNez">
-      <label>Radius jonction toit↔nez <span class="val" id="v-rJonctionToitNez">8</span> mm</label>
-      <input type="range" id="rJonctionToitNez" min="1" max="30" value="8" step="0.5">
-    </div>
-    <div id="f-nezRTGArc" style="display:none">
-      <div class="field">
-        <label>Radius arc plancher <span class="val" id="v-nezRTGArc">30</span> mm</label>
-        <input type="range" id="nezRTGArc" min="5" max="200" value="30" step="5">
-      </div>
-    </div>
     <div class="field" id="f-radius-coins-face" style="display:none">
-      <label>Coins face (Nez EAD / custom)</label>
+      <label>Coins face (Nez EAD)</label>
       <div class="radio-group">
         <div class="rbtn active" data-g="coinsNezType" data-v="none">Aucun</div>
         <div class="rbtn" data-g="coinsNezType" data-v="radius">Arrondi</div>
         <div class="rbtn" data-g="coinsNezType" data-v="biseau">Biseau</div>
+        <div class="rbtn" data-g="coinsNezType" data-v="bombe">Bombé</div>
       </div>
     </div>
     <div id="radius-coins-nez-opts" style="display:none">
@@ -877,7 +904,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <div style="font-size:0.62rem;font-family:DM Mono,monospace;opacity:0.6;margin-bottom:6px">Forme = plancher · empilement de couches carton</div>
       <div class="field">
         <label>Épaisseur totale <span class="val" id="v-pareChocsEp">5</span> mm</label>
-        <input type="range" id="pareChocsEp" min="1" max="30" value="5" step="0.5">
+        <input type="range" id="pareChocsEp" min="-30" max="30" value="5" step="0.5">
       </div>
     </div>
   </div>
@@ -972,11 +999,11 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
     </div>
     <div class="field">
       <label>Cellule grille L <span class="val" id="v-grilleMarCellW">6</span> mm</label>
-      <input type="range" id="grilleMarCellW" min="2" max="15" value="6" step="1">
+      <input type="range" id="grilleMarCellW" min="2" max="40" value="6" step="1">
     </div>
     <div class="field">
       <label>Cellule grille H <span class="val" id="v-grilleMarCellH">4</span> mm</label>
-      <input type="range" id="grilleMarCellH" min="2" max="15" value="4" step="1">
+      <input type="range" id="grilleMarCellH" min="2" max="40" value="4" step="1">
     </div>
     <div class="field">
       <label>Espacement <span class="val" id="v-grilleMarGap">2</span> mm</label>
@@ -1038,6 +1065,10 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
     <div class="field">
       <label class="ckrow"><input type="checkbox" id="fenSplit"> Fenêtre séparée en 2 (double vitrage)</label>
     </div>
+    <div class="field" id="f-fenSplitRatio" style="display:none">
+      <label>Ratio haut/bas <span class="val" id="v-fenSplitRatio">50</span> %</label>
+      <input type="range" id="fenSplitRatio" min="10" max="90" value="50" step="5">
+    </div>
     <div class="field">
       <label class="ckrow"><input type="checkbox" id="fenContour"> Générer contours extérieurs séparés</label>
     </div>
@@ -1045,10 +1076,9 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       <label>Épaisseur contour <span class="val" id="v-fenContourEp">2</span> mm</label>
       <input type="range" id="fenContourEp" min="1" max="8" value="2" step="0.5">
     </div>
-  </div>
 
-  <!-- FENÊTRES CABINE (dans section fenêtres) -->
-  <div class="section" id="sec-fen-cabine" style="padding:0 16px 12px">
+  <!-- FENÊTRES CABINE (sous-section dans sec-fen pour être visible sur mobile) -->
+  <div id="sec-fen-cabine" style="padding-top:8px">
     <div style="font-size:0.65rem;font-family:DM Mono,monospace;opacity:0.6;margin:8px 0 6px">🚂 Fenêtres de conduite (loco)</div>
     <div class="field">
       <label class="ckrow"><input type="checkbox" id="showFenCabine"> Fenêtres de conduite</label>
@@ -1089,7 +1119,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
         <label class="ckrow"><input type="checkbox" id="fenCabineToitEpouse"> Haut épouse le toit</label>
       </div>
       <div class="field">
-        <label class="ckrow"><input type="checkbox" id="fenCabineContour"> Contour (sous-couche relief)</label>
+        <label class="ckrow"><input type="checkbox" id="fenCabineContour"> Contour</label>
       </div>
       <div class="field" id="f-fenCabineContourEp" style="display:none">
         <label>Épaisseur contour <span class="val" id="v-fenCabineContourEp">2</span> mm</label>
@@ -1114,6 +1144,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:1000;height:44px;}
       </div>
     </div>
   </div>
+  </div><!-- /sec-fen (englobe sec-fen-cabine) -->
 
   <!-- RAINURES -->
   <div class="section" id="sec-rain">
@@ -1924,10 +1955,10 @@ const DEFAULT_WAGON = {
   vehicle: 'wagon',
   longueur: 200, largeur: 60, hauteur: 50, epaisseur: 3,
   toit: 'plat', segments: 4, toitHauteur: 15, coupoleEcras: 0,
-  nbFen: 4, wFen: 22, hFen: 16, yFen: 30, radiusFen: 3, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenContour: false, fenContourEp: 2,
+  nbFen: 4, wFen: 22, hFen: 16, yFen: 30, radiusFen: 3, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenSplitRatio: 50, fenContour: false, fenContourEp: 2,
   nbPortes: 0, wPorte1:18, wPorte2:18, wPorte3:18, radiusPorte: 2, portePosX: 25, portePosX2: 75, portePosX3: 50, porteDouble: false,
   porteMargH: 2, porteMargB: 2, showMainsMontoires: false, mainsMY1: 30, mainsMEsp: 15, mainsMMarg: 4, nbReliefPorte1:1, nbReliefPorte2:1, nbReliefPorte3:1, reliefPorteW1:14, reliefPorteH1:20, reliefPorteW2:14, reliefPorteH2:20, reliefPorteW3:14, reliefPorteH3:20, reliefPorteGap: 4, reliefPorteOffsetY: 0,
-  nez: 'casse', rtgInclin: 30, rtgArrondi: 20, nezAngle: 30, nezH: 60, cabine: 25, cabineArriere: 25, showBombage: false, bombageSag: 5, bombageEsp: 5, showGabarit: false, showGabaritCoins: false, gabaritEp: 20, showRadiusCoinsNez: false, coinsNezType: 'none', radiusCoinsNez: 8, gabaritEpCoins: 20, nezRadius: 0, nezBiaisProfilePts: [], nezBiaisNbPoints: 5, nezBiaisBezier: true, nezBiaisRainEsp: 5, nezBiaisTipRadius: 0, nezFaceType: 'plat', nezFaceAngle: 20, nezFaceAngle2: 20, nezRTGAngle: 20, nezRTGArc: 30, showBiseauJonction: false, biseauJonctionH: 5, nezTurboArc: 10, nezTurboIncl: 20, nezSymetrie: false, showEncocheFace: false, encocheFaceW: 30, encocheFaceH: 10, encocheFaceX: 50, encocheFaceBiseau: 0, showPareChocs: false, pareChocsEp: 5, showChassePierre: false, chasseW: 60, chasseH: 30, chasseBiseau: 15, chasseNbLames: 4, chasseLameH: 3, chasseSuppW: 20, chasseSuppBiseau: 15, showArretePli: false, arretePliPos: 30, arretePliVal: 5, showCourbeBasNez: false, arretePliDir: 'haut',
+  nez: 'casse', rtgInclin: 30, rtgArrondi: 20, rtgHStart: 0, showDessousNez: false, dessousNezH: 10, dessousNezL: 100, dessousNezEffilage: 0, nezAngle: 30, nezH: 60, cabine: 25, cabineArriere: 25, showBombage: false, bombageSag: 5, bombageEsp: 5, showGabarit: false, showGabaritCoins: false, gabaritEp: 20, showRadiusCoinsNez: false, coinsNezType: 'none', radiusCoinsNez: 8, gabaritEpCoins: 20, nezRadius: 0, nezBiaisProfilePts: [], nezBiaisNbPoints: 5, nezBiaisBezier: true, nezBiaisRainEsp: 5, nezBiaisTipRadius: 0, nezFaceType: 'plat', nezFaceAngle: 20, nezFaceAngle2: 20, nezRTGAngle: 20, nezRTGArc: 30, showBiseauJonction: false, biseauJonctionH: 5, nezTurboArc: 10, nezTurboIncl: 20, nezSymetrie: false, showEncocheFace: false, encocheFaceW: 30, encocheFaceH: 10, encocheFaceX: 50, encocheFaceBiseau: 0, showPareChocs: false, pareChocsEp: 5, showChassePierre: false, chasseW: 60, chasseH: 30, chasseBiseau: 15, chasseNbLames: 4, chasseLameH: 3, chasseSuppW: 20, chasseSuppBiseau: 15, showArretePli: false, arretePliPos: 30, arretePliVal: 5, showCourbeBasNez: false, arretePliDir: 'haut',
   radiusToit: 5, radiusCoins: 5, radiusFondJonction: 3, rJonctionToitNez: 8, rJonctionToitNez: 8,
   showRelief: false, reliefScale: 70, reliefOffsetY: 0,
   showPhares: false, showCalePhare: false, showFenCabine: false, fenCabineToitEpouse: false, fenCabineContour: false, fenCabineRatio: 50, fenCabineContourEp: 2, showAuvent: false, auventH: 5, auventRatio: 75, auventBiseau: 0, fenCabineForme: 'rect', fenCabineW: 12, fenCabineH: 10, fenCabineR: 2, fenCabineY: 30, fenCabineMarg: 5, calePhareW: 12, calePhareH: 1, nbPhares: 2, diamePhare: 8, phareY: 25, phareMarg: 4, phareForme: 'cercle', phareDouble: false, phareDoubleOrient: 'horizontal', phareEsp: 2, phareContour: false, phareContourEp: 2,
@@ -1947,10 +1978,10 @@ const DEFAULT_LOCO  = {
   vehicle: 'loco',
   longueur: 180, largeur: 54, hauteur: 45, epaisseur: 3,
   toit: 'plat', segments: 4, toitHauteur: 15, coupoleEcras: 0,
-  nbFen: 4, wFen: 22, hFen: 16, yFen: 30, radiusFen: 3, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenContour: false, fenContourEp: 2,
+  nbFen: 4, wFen: 22, hFen: 16, yFen: 30, radiusFen: 3, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenSplitRatio: 50, fenContour: false, fenContourEp: 2,
   nbPortes: 0, wPorte1:18, wPorte2:18, wPorte3:18, radiusPorte: 2, portePosX: 25, portePosX2: 75, portePosX3: 50, porteDouble: false,
   porteMargH: 2, porteMargB: 2, showMainsMontoires: false, mainsMY1: 30, mainsMEsp: 15, mainsMMarg: 4, nbReliefPorte1:1, nbReliefPorte2:1, nbReliefPorte3:1, reliefPorteW1:14, reliefPorteH1:20, reliefPorteW2:14, reliefPorteH2:20, reliefPorteW3:14, reliefPorteH3:20, reliefPorteGap: 4, reliefPorteOffsetY: 0,
-  nez: 'casse', rtgInclin: 30, rtgArrondi: 20, nezAngle: 30, nezH: 60, cabine: 25, cabineArriere: 25, showBombage: false, bombageSag: 5, bombageEsp: 5, showGabarit: false, showGabaritCoins: false, gabaritEp: 20, showRadiusCoinsNez: false, coinsNezType: 'none', radiusCoinsNez: 8, gabaritEpCoins: 20, nezRadius: 0, nezBiaisProfilePts: [], nezBiaisNbPoints: 5, nezBiaisBezier: true, nezBiaisRainEsp: 5, nezBiaisTipRadius: 0, nezFaceType: 'plat', nezFaceAngle: 20, nezFaceAngle2: 20, nezRTGAngle: 20, nezRTGArc: 30, showBiseauJonction: false, biseauJonctionH: 5, nezTurboArc: 10, nezTurboIncl: 20, nezSymetrie: false, showEncocheFace: false, encocheFaceW: 30, encocheFaceH: 10, encocheFaceX: 50, encocheFaceBiseau: 0, showPareChocs: false, pareChocsEp: 5, showChassePierre: false, chasseW: 60, chasseH: 30, chasseBiseau: 15, chasseNbLames: 4, chasseLameH: 3, chasseSuppW: 20, chasseSuppBiseau: 15, showArretePli: false, arretePliPos: 30, arretePliVal: 5, showCourbeBasNez: false, arretePliDir: 'haut',
+  nez: 'casse', rtgInclin: 30, rtgArrondi: 20, rtgHStart: 0, showDessousNez: false, dessousNezH: 10, dessousNezL: 100, dessousNezEffilage: 0, nezAngle: 30, nezH: 60, cabine: 25, cabineArriere: 25, showBombage: false, bombageSag: 5, bombageEsp: 5, showGabarit: false, showGabaritCoins: false, gabaritEp: 20, showRadiusCoinsNez: false, coinsNezType: 'none', radiusCoinsNez: 8, gabaritEpCoins: 20, nezRadius: 0, nezBiaisProfilePts: [], nezBiaisNbPoints: 5, nezBiaisBezier: true, nezBiaisRainEsp: 5, nezBiaisTipRadius: 0, nezFaceType: 'plat', nezFaceAngle: 20, nezFaceAngle2: 20, nezRTGAngle: 20, nezRTGArc: 30, showBiseauJonction: false, biseauJonctionH: 5, nezTurboArc: 10, nezTurboIncl: 20, nezSymetrie: false, showEncocheFace: false, encocheFaceW: 30, encocheFaceH: 10, encocheFaceX: 50, encocheFaceBiseau: 0, showPareChocs: false, pareChocsEp: 5, showChassePierre: false, chasseW: 60, chasseH: 30, chasseBiseau: 15, chasseNbLames: 4, chasseLameH: 3, chasseSuppW: 20, chasseSuppBiseau: 15, showArretePli: false, arretePliPos: 30, arretePliVal: 5, showCourbeBasNez: false, arretePliDir: 'haut',
   radiusToit: 5, radiusCoins: 5, radiusFondJonction: 3,
   showRelief: false, reliefScale: 70, reliefOffsetY: 0,
   showPhares: false, showCalePhare: false, showFenCabine: false, fenCabineToitEpouse: false, fenCabineContour: false, fenCabineRatio: 50, fenCabineContourEp: 2, showAuvent: false, auventH: 5, auventRatio: 75, auventBiseau: 0, fenCabineForme: 'rect', fenCabineW: 12, fenCabineH: 10, fenCabineR: 2, fenCabineY: 30, fenCabineMarg: 5, calePhareW: 12, calePhareH: 1, nbPhares: 2, diamePhare: 8, phareY: 25, phareMarg: 4, phareForme: 'cercle', phareDouble: false, phareDoubleOrient: 'horizontal', phareEsp: 2, phareContour: false, phareContourEp: 2,
@@ -2001,7 +2032,7 @@ const DEFAULT_MARCHANDISE = {
   nbPhares: 2, diamePhare: 8, phareY: 50, phareMarg: 4, phareForme: 'cercle',
   phareDouble: false, phareDoubleOrient: 'horizontal', phareEsp: 2, phareContour: false, phareContourEp: 2,
   // Fenêtres cabine
-  nbFen: 2, wFen: 18, hFen: 14, yFen: 25, radiusFen: 2, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenContour: false, fenContourEp: 2,
+  nbFen: 2, wFen: 18, hFen: 14, yFen: 25, radiusFen: 2, fenEtage: false, yFen2: 60, hFen2: 12, xFen2: 50, fenDeleted: [], fenSplit: false, fenSplitRatio: 50, fenContour: false, fenContourEp: 2,
   // Fenêtres de conduite (pour les FACE AV/AR CABINE)
   showFenCabine: false, fenCabineToitEpouse: false, fenCabineContour: false, fenCabineRatio: 50, fenCabineContourEp: 2, showAuvent: false, auventH: 5, auventRatio: 75, auventBiseau: 0, fenCabineForme: 'rect', fenCabineW: 12, fenCabineH: 10, fenCabineR: 2, fenCabineY: 30, fenCabineMarg: 5,
   // Tampons
@@ -2087,10 +2118,10 @@ function sl(id, key) {
 }
 sl('longueur','longueur'); sl('largeur','largeur'); sl('hauteur','hauteur'); sl('epaisseur','epaisseur');
 sl('segments','segments'); sl('toitHauteur','toitHauteur'); sl('coupoleEcras','coupoleEcras'); sl('nbFen','nbFen'); sl('wFen','wFen'); sl('hFen','hFen'); sl('yFen2','yFen2'); sl('hFen2','hFen2'); sl('xFen2','xFen2');
-sl('yFen','yFen'); sl('radiusFen','radiusFen'); sl('fenContourEp','fenContourEp'); for(let _w=1;_w<=3;_w++) sl('wPorte'+_w,'wPorte'+_w); sl('portePosX','portePosX'); sl('portePosX2','portePosX2'); sl('portePosX3','portePosX3'); sl('radiusPorte','radiusPorte');
+sl('yFen','yFen'); sl('radiusFen','radiusFen'); sl('fenContourEp','fenContourEp'); sl('fenSplitRatio','fenSplitRatio'); for(let _w=1;_w<=3;_w++) sl('wPorte'+_w,'wPorte'+_w); sl('portePosX','portePosX'); sl('portePosX2','portePosX2'); sl('portePosX3','portePosX3'); sl('radiusPorte','radiusPorte');
 sl('porteMargH','porteMargH'); sl('porteMargB','porteMargB'); sl('mainsMY1','mainsMY1'); sl('mainsMEsp','mainsMEsp'); sl('mainsMMarg','mainsMMarg');
 for(let _p=1;_p<=3;_p++){sl('nbReliefPorte'+_p,'nbReliefPorte'+_p); sl('reliefPorteW'+_p,'reliefPorteW'+_p); sl('reliefPorteH'+_p,'reliefPorteH'+_p);} sl('reliefPorteGap','reliefPorteGap'); sl('reliefPorteOffsetY','reliefPorteOffsetY');
-sl('encocheFaceW','encocheFaceW'); sl('encocheFaceH','encocheFaceH'); sl('encocheFaceX','encocheFaceX'); sl('encocheFaceBiseau','encocheFaceBiseau'); sl('rtgInclin','rtgInclin'); sl('rtgArrondi','rtgArrondi'); sl('nezAngle','nezAngle'); sl('nezH','nezH'); sl('cabine','cabine'); sl('cabineArriere','cabineArriere'); sl('nezRadius','nezRadius'); sl('arretePliPos','arretePliPos'); sl('chasseW','chasseW'); sl('chasseH','chasseH'); sl('chasseBiseau','chasseBiseau'); sl('chasseNbLames','chasseNbLames'); sl('chasseLameH','chasseLameH'); sl('chasseSuppW','chasseSuppW'); sl('chasseSuppBiseau','chasseSuppBiseau'); sl('arretePliVal','arretePliVal'); sl('nezBiaisRainEsp','nezBiaisRainEsp'); sl('nezTurboArc','nezTurboArc'); sl('nezTurboIncl','nezTurboIncl'); sl('bombageSag','bombageSag'); sl('bombageEsp','bombageEsp'); sl('gabaritEp','gabaritEp'); sl('radiusCoinsNez','radiusCoinsNez'); sl('gabaritEpCoins','gabaritEpCoins'); sl('bogieEncW','bogieEncW'); sl('bogieEncW2','bogieEncW2'); sl('grilleX','grilleX'); sl('grilleY','grilleY'); sl('grilleW','grilleW'); sl('grilleH','grilleH'); sl('grilleCellW','grilleCellW'); sl('grilleCellH','grilleCellH'); sl('grilleCellR','grilleCellR'); sl('grilleGap','grilleGap'); sl('grilleR','grilleR'); sl('pareChocsEp','pareChocsEp'); sl('capotAvantL','capotAvantL'); sl('capotArriereL','capotArriereL'); sl('cabineMarPct','cabineMarPct'); sl('capotsH','capotsH'); sl('grilleMarCellW','grilleMarCellW'); sl('grilleMarCellH','grilleMarCellH'); sl('grilleMarGap','grilleMarGap'); sl('grilleMarMarg','grilleMarMarg'); sl('cabineDebordW','cabineDebordW'); sl('cabineDebordH','cabineDebordH'); sl('cabineDebordBiseau','cabineDebordBiseau'); sl('cabineLargeur','cabineLargeur'); sl('cabineHauteur','cabineHauteur'); sl('plancherAvantPct','plancherAvantPct'); sl('plancherAvantBis','plancherAvantBis'); sl('cabineHautR','cabineHautR'); sl('cabineHautB','cabineHautB'); sl('cabineHautArc','cabineHautArc'); sl('cabineDessusDebord','cabineDessusDebord');
+sl('encocheFaceW','encocheFaceW'); sl('encocheFaceH','encocheFaceH'); sl('encocheFaceX','encocheFaceX'); sl('encocheFaceBiseau','encocheFaceBiseau'); sl('rtgInclin','rtgInclin'); sl('rtgArrondi','rtgArrondi'); sl('rtgHStart','rtgHStart'); sl('dessousNezH','dessousNezH'); sl('dessousNezL','dessousNezL'); sl('dessousNezEffilage','dessousNezEffilage'); sl('nezAngle','nezAngle'); sl('nezH','nezH'); sl('cabine','cabine'); sl('cabineArriere','cabineArriere'); sl('nezRadius','nezRadius'); sl('arretePliPos','arretePliPos'); sl('chasseW','chasseW'); sl('chasseH','chasseH'); sl('chasseBiseau','chasseBiseau'); sl('chasseNbLames','chasseNbLames'); sl('chasseLameH','chasseLameH'); sl('chasseSuppW','chasseSuppW'); sl('chasseSuppBiseau','chasseSuppBiseau'); sl('arretePliVal','arretePliVal'); sl('nezBiaisRainEsp','nezBiaisRainEsp'); sl('nezTurboArc','nezTurboArc'); sl('nezTurboIncl','nezTurboIncl'); sl('bombageSag','bombageSag'); sl('bombageEsp','bombageEsp'); sl('gabaritEp','gabaritEp'); sl('radiusCoinsNez','radiusCoinsNez'); sl('gabaritEpCoins','gabaritEpCoins'); sl('bogieEncW','bogieEncW'); sl('bogieEncW2','bogieEncW2'); sl('grilleX','grilleX'); sl('grilleY','grilleY'); sl('grilleW','grilleW'); sl('grilleH','grilleH'); sl('grilleCellW','grilleCellW'); sl('grilleCellH','grilleCellH'); sl('grilleCellR','grilleCellR'); sl('grilleGap','grilleGap'); sl('grilleR','grilleR'); sl('pareChocsEp','pareChocsEp'); sl('capotAvantL','capotAvantL'); sl('capotArriereL','capotArriereL'); sl('cabineMarPct','cabineMarPct'); sl('capotsH','capotsH'); sl('grilleMarCellW','grilleMarCellW'); sl('grilleMarCellH','grilleMarCellH'); sl('grilleMarGap','grilleMarGap'); sl('grilleMarMarg','grilleMarMarg'); sl('cabineDebordW','cabineDebordW'); sl('cabineDebordH','cabineDebordH'); sl('cabineDebordBiseau','cabineDebordBiseau'); sl('cabineLargeur','cabineLargeur'); sl('cabineHauteur','cabineHauteur'); sl('plancherAvantPct','plancherAvantPct'); sl('plancherAvantBis','plancherAvantBis'); sl('cabineHautR','cabineHautR'); sl('cabineHautB','cabineHautB'); sl('cabineHautArc','cabineHautArc'); sl('cabineDessusDebord','cabineDessusDebord');
   ['A','B','C'].forEach(k => { ['Nb','X','L','W','H','BL','BW','R','GW','GH','GT','GM'].forEach(p => sl('equip'+k+p,'equip'+k+p)); }); sl('bogieEncH','bogieEncH'); sl('bogieHauteur','bogieHauteur'); sl('bogieEncBiseau','bogieEncBiseau'); sl('bogiePos1','bogiePos1'); sl('bogiePos2','bogiePos2'); sl('bogieEncOffsetY','bogieEncOffsetY'); sl('nezFaceAngle','nezFaceAngle'); sl('nezFaceAngle2','nezFaceAngle2'); sl('nezRTGAngle','nezRTGAngle'); sl('nezRTGArc','nezRTGArc'); sl('biseauJonctionH','biseauJonctionH');
 
 // ── cabineCentraleL : quand on bouge ce slider en mode marchandise,
@@ -2184,7 +2215,7 @@ function initNezOpts() {
   const isRTG    = S.nez === 'rtg';
   (document.getElementById('nez-casse-opts')||{style:{}}).style.display = isCasse ? 'block' : 'none';
   _el('nez-tgv-only-opts').style.display = isCasse ? 'block' : 'none';
-  _el('f-nezRTGArc').style.display = isRTG ? 'block' : 'none';
+  (document.getElementById('f-nezRTGArc')||{style:{}}).style.display = isRTG ? 'block' : 'none';
   ['f-nezH','f-cabine','f-nezRadius'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = isCasse ? 'block' : 'none';
@@ -2195,7 +2226,6 @@ function initNezOpts() {
   const _turboEl = document.getElementById('nez-turbo-opts');
   if (_turboEl) _turboEl.style.display = 'none';
   _el('rtg-opts').style.display = isRTG ? 'block' : 'none';
-  _el('f-bombage').style.display = isPlat ? 'block' : 'none';
   _el('bombage-opts').style.display = (isPlat && S.showBombage) ? 'block' : 'none';
   _el('f-radius-coins-face').style.display = isPlat ? 'block' : 'none';
   _el('radius-coins-nez-opts').style.display = (isPlat && S.showRadiusCoinsNez) ? 'block' : 'none';
@@ -2256,8 +2286,12 @@ document.querySelectorAll('.rbtn').forEach(b => {
     if (g === 'nbGrilles') { S.nbGrilles = parseInt(v); }
     if (g === 'coinsNezType') {
       S.coinsNezType = v;
-      S.showRadiusCoinsNez = (v !== 'none');
-      _el('radius-coins-nez-opts').style.display = (v !== 'none') ? 'block' : 'none';
+      const isBombe = (v === 'bombe');
+      const hasCoins = (v !== 'none' && !isBombe);
+      S.showRadiusCoinsNez = hasCoins;
+      S.showBombage = isBombe;
+      _el('radius-coins-nez-opts').style.display = hasCoins ? 'block' : 'none';
+      _el('bombage-opts').style.display = isBombe ? 'block' : 'none';
       redraw();
     }
     if (g === 'arretePliDir') S.arretePliDir = v;
@@ -2280,12 +2314,11 @@ document.querySelectorAll('.rbtn').forEach(b => {
       const isCasse2 = v === 'casse';
       (document.getElementById('nez-casse-opts')||{style:{}}).style.display = isCasse2 ? 'block' : 'none';
       _el('nez-tgv-only-opts').style.display = isCasse2 ? 'block' : 'none';
-      _el('f-nezRTGArc').style.display = (v === 'rtg') ? 'block' : 'none';
+      (document.getElementById('f-nezRTGArc')||{style:{}}).style.display = (v === 'rtg') ? 'block' : 'none';
       _el('btn-nez-custom').style.display = isCustom2 ? 'block' : 'none';
       _el('biseau-jonction-opts').style.display = isCustom2 ? 'block' : 'none';
       _el('biseau-jonction-h-opts').style.display = (isCustom2 && S.showBiseauJonction) ? 'block' : 'none';
       _el('nez-turbo-opts').style.display = isCasse2 || isCustom2 ? 'none' : (isPlat ? 'none' : 'none'); // handled in buildNezPreviews
-      _el('f-bombage').style.display = isPlat ? 'block' : 'none';
       _el('bombage-opts').style.display = (isPlat && S.showBombage) ? 'block' : 'none';
       _el('f-radius-coins-face').style.display = isPlat ? 'block' : 'none';
       _el('radius-coins-nez-opts').style.display = (isPlat && S.showRadiusCoinsNez) ? 'block' : 'none';
@@ -2415,6 +2448,20 @@ document.getElementById('showArretePli')?.addEventListener('change', e => {
   _el('arrete-pli-opts').style.display = e.target.checked ? 'block' : 'none';
   _el('f-courbe-bas-nez').style.display = e.target.checked ? 'block' : 'none';
   _el('f-nezFaceAngle2').style.display = (e.target.checked && S.nezFaceType === 'incline' && !S.showCourbeBasNez) ? 'block' : 'none';
+  // Quand l'arrête haute est pliée, limiter les inclinaisons à 15° max (sinon 60°)
+  const maxAngle = e.target.checked ? 15 : 60;
+  ['nezFaceAngle','nezFaceAngle2'].forEach(id => {
+    const sliderEl = document.getElementById(id);
+    if (sliderEl) {
+      sliderEl.max = maxAngle;
+      if (parseFloat(sliderEl.value) > maxAngle) {
+        sliderEl.value = maxAngle;
+        S[id] = maxAngle;
+        const vEl = document.getElementById('v-' + id);
+        if (vEl) vEl.textContent = maxAngle;
+      }
+    }
+  });
   // Quand l'arrête haute est pliée, on masque l'éditeur de courbure et le slider rainures,
   // et on grise les 6 presets de courbe (incompatibles avec l'arrête pliée)
   _el('btn-editer-courbure').style.display = e.target.checked ? 'none' : 'block';
@@ -2474,6 +2521,12 @@ document.getElementById('phareDoubleOrient')?.addEventListener('change', e => {
 document.getElementById('showAuvent')?.addEventListener('change', e => {
   S.showAuvent = e.target.checked;
   _el('auvent-opts').style.display = e.target.checked ? 'block' : 'none';
+  redraw();
+});
+
+document.getElementById('showDessousNez')?.addEventListener('change', e => {
+  S.showDessousNez = e.target.checked;
+  _el('dessous-nez-opts').style.display = e.target.checked ? 'block' : 'none';
   redraw();
 });
 
@@ -2549,7 +2602,7 @@ document.getElementById('nezSymetrie')?.addEventListener('change', e => {
 function updateNezCourbureUI() {
   // nezCourbure n'existe plus, cette fonction est un no-op
 }
-document.getElementById('fenSplit')?.addEventListener('change', e => { S.fenSplit = e.target.checked; redraw(); });
+document.getElementById('fenSplit')?.addEventListener('change', e => { S.fenSplit = e.target.checked; _el('f-fenSplitRatio').style.display = e.target.checked ? 'block' : 'none'; redraw(); });
 document.getElementById('fenContour')?.addEventListener('change', e => {
   S.fenContour = e.target.checked;
   _el('f-fenContourEp').style.display = e.target.checked ? 'block' : 'none';
@@ -2604,6 +2657,13 @@ function switchVehicle(v) {
   if (fCabX) fCabX.style.display        = isMar ? 'block' : 'none';
   const btnMar = _el('btn-nav-mar');
   if (btnMar) btnMar.style.display      = isMar ? '' : 'none';
+  // Le bouton NEZ n'est pertinent que pour loco (la section section-loco est cachée
+  // en mode marchandise et wagon)
+  const btnNez = _el('btn-nav-nez');
+  if (btnNez) btnNez.style.display      = isLoco ? '' : 'none';
+  // Sous-section "Fenêtres de conduite" : cachée en mode wagon
+  const subFenCab = _el('sec-fen-cabine');
+  if (subFenCab) subFenCab.style.display = (isLoco || isMar) ? 'block' : 'none';
   syncUIFromState();
   redraw();
 }
@@ -2763,7 +2823,7 @@ function buildNezPreviews() {
       // Nez TGV : options face + biais + arrête
       (document.getElementById('nez-casse-opts')||{style:{}}).style.display = isCasse ? 'block' : 'none';
       _el('nez-tgv-only-opts').style.display = isCasse ? 'block' : 'none';
-      _el('f-nezRTGArc').style.display = (n.id === 'rtg') ? 'block' : 'none';
+      (document.getElementById('f-nezRTGArc')||{style:{}}).style.display = (n.id === 'rtg') ? 'block' : 'none';
       ['f-nezH','f-cabine','f-nezRadius'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = isCasse ? 'block' : 'none';
@@ -2777,7 +2837,6 @@ function buildNezPreviews() {
   _el('nez-turbo-opts').style.display = isTurbo0 ? 'block' : 'none';
       // Nez RTG
       // Nez EAD : bombage + coins
-      _el('f-bombage').style.display = isPlat ? 'block' : 'none';
       _el('bombage-opts').style.display = (isPlat && S.showBombage) ? 'block' : 'none';
       _el('f-radius-coins-face').style.display = isPlat ? 'block' : 'none';
       _el('radius-coins-nez-opts').style.display = (isPlat && S.showRadiusCoinsNez) ? 'block' : 'none';
@@ -2900,7 +2959,9 @@ function foldLine(x1, y1, x2, y2) {
 }
 
 function reliefRect(x, y, w, h, r) {
-  if (S._exportMode) return; // pas de pointillés verts à l'export
+  // À l'export : on cache les pointillés verts SAUF s'ils sont sur une pièce RELIEF
+  // (où les sous-couches sont les seuls éléments, ils doivent être découpés)
+  if (S._exportMode && !S._reliefMode) return;
   const rx=x*SC, ry=y*SC, rw=w*SC, rh=h*SC, rr=Math.min(r*SC,rw/2,rh/2);
   draw.rect(rw,rh).radius(rr).move(rx,ry).fill('none').stroke({ color: RELIEF, width: 1 });
 }
@@ -2974,7 +3035,12 @@ function openDrawer(sectionId, el) {
 
   // Titre
   const stitle = el.querySelector('.stitle');
-  title.textContent = stitle ? stitle.textContent : 'Paramètres';
+  const titleTextEl = document.getElementById('mobile-drawer-title-text');
+  if (titleTextEl) {
+    titleTextEl.textContent = stitle ? stitle.textContent : 'Paramètres';
+  } else {
+    title.textContent = stitle ? stitle.textContent : 'Paramètres';
+  }
 
   // Mémoriser la position originale
   _drawerSection       = el;
@@ -3103,10 +3169,12 @@ function faceCourbeArcLength(nD, largeur, steps) {
 // Sagitta = hauteur de l'arc (bombement max au centre)
 // ═══════════════════════════════════════════════════
 function bombageArcLength(largeur, sag) {
+  // Garde-fou : sag ne peut pas dépasser largeur/2 (limite géométrique = demi-cercle)
+  const sagSafe = Math.min(sag, largeur / 2 - 0.01);
   // Rayon du cercle osculateur
-  const R = (largeur*largeur/4 + sag*sag) / (2*sag);
+  const R = (largeur*largeur/4 + sagSafe*sagSafe) / (2*sagSafe);
   // Demi-angle
-  const halfAngle = Math.asin(largeur / (2*R));
+  const halfAngle = Math.asin(Math.min(1, largeur / (2*R)));
   // Longueur d'arc
   return 2 * R * halfAngle;
 }
@@ -3254,201 +3322,192 @@ function getPlanchContourPath(ppx, ppy) {
 
 // Dessine la pièce pare-chocs : largeur de la loco × épaisseur slider,
 // avec le bord SUPÉRIEUR qui suit la forme avant du plancher (chamfers, arc, etc.)
+// Retourne une polyline (liste de points {x,y}) représentant la courbe avant du plancher
+// (= l'extrémité gauche du plancher vu de dessus, sans la partie rectangulaire arrière).
+// Le profil commence à (0, 0) (coin haut-gauche) et finit à (0, W) (coin bas-gauche)
+// en passant par les courbures du nez. W = largeur effective du plancher.
+function getNezAvantProfile(Wparam) {
+  // W effective : pour le plancher loco, on utilise planchLarg (sans 2×epaisseur).
+  // Mais Wparam est passé en paramètre pour flexibilité.
+  const W = Wparam;
+  const pts = [];
+  const N = 30; // résolution
+
+  if (S.nez === 'plat') {
+    // Bombage : arc circulaire en saillie vers la gauche (profondeur = sag)
+    if (S.showBombage && S.bombageSag > 0) {
+      const sag = Math.min(S.bombageSag, W/2 - 0.01);
+      const R   = (W*W/4 + sag*sag) / (2*sag);
+      // Le plancher trace : L→(0, W) puis A→(0, 0) (arc va vers la gauche)
+      // L'arc passe par le point (-sag, W/2) (la pointe avancée du bombage)
+      // Équation : centre = (R-sag, W/2), donc le point au pic est (R-sag - R, W/2) = (-sag, W/2)
+      const cx = R - sag;  // centre x (à droite de l'origine)
+      const cy = W / 2;
+      // Échantillonner du point (0, 0) au point (0, W) en passant par (-sag, W/2)
+      // Angle au départ (0,0) par rapport au centre : (0-cx, 0-cy)/R = (-cx/R, -cy/R)
+      // angle1 = atan2(0-cy, 0-cx) = atan2(-cy, -cx)
+      const a0 = Math.atan2(0 - cy, 0 - cx); // angle au point (0,0)
+      const a1 = Math.atan2(W - cy, 0 - cx); // angle au point (0,W)
+      // Parcourir de a0 à a1 en passant par π (le point (-sag, W/2) est à angle π)
+      // Comme a0 est dans Q3 et a1 dans Q2, on parcourt en passant par π
+      // Si a0 < 0 et a1 > 0, il faut passer par ±π
+      // On échantillonne de a0 à a1 - 2π (sens horaire) si nécessaire... simpler:
+      // L'arc passe par x < 0, donc on échantillonne avec sens trigonométrique inverse
+      // On utilise une paramétrisation directe de l'arc
+      for (let i = 0; i <= N; i++) {
+        const t = i / N;
+        const y = t * W;
+        // Pour y donné, x sur l'arc : (x-cx)² + (y-cy)² = R², avec x < cx
+        const dx = Math.sqrt(Math.max(0, R*R - (y - cy)*(y - cy)));
+        const x = cx - dx;  // côté gauche du cercle (x négatif au pic)
+        pts.push({ x: x, y: y });
+      }
+      return pts;
+    }
+    // Coins arrondis ou biseau
+    if (S.showRadiusCoinsNez && S.radiusCoinsNez > 0 && S.coinsNezType !== 'none' && S.coinsNezType !== 'bombe') {
+      const b = Math.min(S.radiusCoinsNez, W/2, S.longueur/2);
+      if (S.coinsNezType === 'biseau') {
+        // 3 segments comme le plancher : (b,0) → (0,b) → (0,W-b) → (b,W)
+        pts.push({ x: b, y: 0 });
+        pts.push({ x: 0, y: b });
+        pts.push({ x: 0, y: W - b });
+        pts.push({ x: b, y: W });
+        return pts;
+      } else if (S.coinsNezType === 'radius') {
+        // Arrondi : arc haut (b,0) → (0,b), bord droit (0,b)→(0,W-b), arc bas (0,W-b)→(b,W)
+        // Quart de cercle haut : centre (b,b), de (b,0) à (0,b)
+        for (let i = 0; i <= N/2; i++) {
+          const t = i / (N/2);
+          const angle = -Math.PI/2 + t * (-Math.PI/2); // -π/2 à -π (sens horaire dans repère SVG)
+          pts.push({ x: b + b * Math.cos(angle), y: b + b * Math.sin(angle) });
+        }
+        // Quart de cercle bas : centre (b, W-b), de (0,W-b) à (b,W)
+        for (let i = 0; i <= N/2; i++) {
+          const t = i / (N/2);
+          const angle = Math.PI + t * (-Math.PI/2); // π à π/2
+          pts.push({ x: b + b * Math.cos(angle), y: (W - b) + b * Math.sin(angle) });
+        }
+        return pts;
+      }
+    }
+    // Plat sans coins : ligne verticale droite
+    pts.push({ x: 0, y: 0 });
+    pts.push({ x: 0, y: W });
+    return pts;
+  }
+
+  if (S.nez === 'casse') {
+    // Nez cassé : profil biais (vue de dessus)
+    const nezD = S.longueur * S.cabine / 100;
+    if (typeof getBiaisProfileMm === 'function') {
+      const profile = getBiaisProfileMm(W, nezD);
+      if (profile && profile.length > 1) {
+        // Adapter : profile a {d, x} où d=profondeur (0 à nezD), x=transverse (0 à W)
+        // On trace de (nezD, 0) à (0, W/2) (le pic) à (nezD, W)
+        for (let i = profile.length - 1; i >= 0; i--) {
+          pts.push({ x: nezD - profile[i].d, y: profile[i].x });
+        }
+        return pts;
+      }
+    }
+    // Fallback V simple
+    pts.push({ x: nezD, y: 0 });
+    pts.push({ x: 0,    y: W/2 });
+    pts.push({ x: nezD, y: W });
+    return pts;
+  }
+
+  if (S.nez === 'custom') {
+    const sag = 5;
+    const R   = (W*W/4 + sag*sag) / (2*sag);
+    const cx = R - sag;
+    const cy = W / 2;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const y = t * W;
+      const dx = Math.sqrt(Math.max(0, R*R - (y - cy)*(y - cy)));
+      pts.push({ x: cx - dx, y: y });
+    }
+    return pts;
+  }
+
+  if (S.nez === 'tgv') {
+    const tipX = (S.bombageSag || 5) * 3;
+    pts.push({ x: 0,    y: 0 });
+    pts.push({ x: -tipX, y: W/2 });
+    pts.push({ x: 0,    y: W });
+    return pts;
+  }
+
+  if (S.nez === 'rtg') {
+    const sag = Math.min(S.rtgArrondi || 20, W/2 - 0.5);
+    const R   = (W*W/4 + sag*sag) / (2*sag);
+    const cx = R - sag;
+    const cy = W / 2;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const y = t * W;
+      const dx = Math.sqrt(Math.max(0, R*R - (y - cy)*(y - cy)));
+      pts.push({ x: cx - dx, y: y });
+    }
+    return pts;
+  }
+
+  pts.push({ x: 0, y: 0 });
+  pts.push({ x: 0, y: W });
+  return pts;
+}
+
 function drawPareChocs(px, py) {
   if (S.vehicle !== 'loco' || !S.showPareChocs) return 0;
-  const ep    = S.epaisseur;
-  const epTot = S.pareChocsEp || 5;
-  const W     = S.largeur;       // largeur de la loco
+  // Le pare-chocs s'imbrique contre le plancher : il doit avoir la même largeur effective
+  const W     = S.largeur - 2 * S.epaisseur;  // largeur du plancher (= planchLarg)
+  const epTot = S.pareChocsEp || 5;  // hauteur des 2 traits verticaux
 
-  // Hauteur du patron : déterminée par la forme du nez ; le bord du bas est à y = epTot
-  // (le patron monte plus haut pour accueillir l'arc/sag/chamfer du nez)
-  let H = epTot;
-  if (S.nez === 'plat') {
-    if (S.showRadiusCoinsNez && S.radiusCoinsNez > 0 && S.coinsNezType !== 'none') {
-      H = Math.max(H, S.radiusCoinsNez);
-    } else if (S.showBombage && S.bombageSag > 0) {
-      H = Math.max(H, S.bombageSag);
-    }
-  } else if (S.nez === 'rtg') {
-    H = Math.max(H, S.rtgArrondi || 20);
+  // 1) Récupère le profil de l'extrémité avant du plancher (vue de dessus)
+  //    Coordonnées du profil : x = profondeur (vers l'avant, négatif), y = transverse (0 à W)
+  const profile = getNezAvantProfile(W);
+
+  // 2) INVERSER le signe de x pour obtenir la forme MIROIR/INVERSE du plancher
+  //    Cela permet au pare-chocs de S'IMBRIQUER dans le plancher (encoche concave où
+  //    le plancher est saillant convexe, et inversement).
+  const inverted = profile.map(p => ({ x: -p.x, y: p.y }));
+
+  // 3) Rotation HORAIRE 90° : (x, y) → (-y, x) en repère SVG
+  const rotated = inverted.map(p => ({ x: -p.y, y: p.x }));
+
+  // 4) Translater pour que xMin = 0, yMin = 0
+  let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+  rotated.forEach(p => {
+    if (p.x < xMin) xMin = p.x;
+    if (p.x > xMax) xMax = p.x;
+    if (p.y < yMin) yMin = p.y;
+    if (p.y > yMax) yMax = p.y;
+  });
+  const norm = rotated.map(p => ({ x: p.x - xMin, y: p.y - yMin }));
+  const profW = xMax - xMin;
+  const profH = yMax - yMin;
+
+  // 5) Construire le path : courbe en HAUT (qui s'imbrique contre le plancher),
+  //    2 verticales DESCENDANTES de epTot, base horizontale en bas.
+  let path = `M${(px + norm[0].x)*SC},${(py + norm[0].y)*SC}`;
+  for (let i = 1; i < norm.length; i++) {
+    path += ` L${(px + norm[i].x)*SC},${(py + norm[i].y)*SC}`;
   }
-  // H est utilisée seulement pour déterminer la hauteur réservée
-
-  let path;
-
-  if (S.nez === 'plat') {
-    if (S.showBombage && S.bombageSag > 0) {
-      // Bombage : arc bombé en haut, bord du bas droit à y = epTot
-      // Si l'arc descend en dessous de y = epTot, on coupe l'arc
-      const sag = S.bombageSag;
-      const Rb  = (W*W/4 + sag*sag) / (2*sag);
-      const Rpx = Rb * SC;
-      const cy_arc = sag + Rb; // centre de l'arc en y
-      // Tous les points de l'arc satisfont x²-centerOffset + (y - cy_arc)² = Rb²
-      // À y = epTot, x sur l'arc : (x - W/2)² + (epTot - cy_arc)² = Rb²
-      const dx2 = Rb*Rb - (epTot - cy_arc)*(epTot - cy_arc);
-      if (epTot < sag || dx2 <= 0) {
-        // Bord bas plus haut que la tête de l'arc → piece dégénérée, on dessine juste l'arc complet jusqu'à epTot
-        path =
-          `M${px*SC},${(py+sag)*SC}` +
-          ` A${Rpx},${Rpx} 0 0,0 ${(px+W)*SC},${(py+sag)*SC}` +
-          ` L${(px+W)*SC},${(py+epTot)*SC}` +
-          ` L${px*SC},${(py+epTot)*SC} Z`;
-      } else {
-        // Bord du bas au niveau y = epTot, complet sur la largeur
-        // (on ne coupe pas l'arc si epTot >= sag)
-        path =
-          `M${px*SC},${(py+sag)*SC}` +
-          ` A${Rpx},${Rpx} 0 0,0 ${(px+W)*SC},${(py+sag)*SC}` +
-          ` L${(px+W)*SC},${(py+epTot)*SC}` +
-          ` L${px*SC},${(py+epTot)*SC} Z`;
-      }
-    } else if (S.showRadiusCoinsNez && S.radiusCoinsNez > 0 && S.coinsNezType !== 'none') {
-      const b = Math.min(S.radiusCoinsNez, W/2);
-      if (S.coinsNezType === 'biseau') {
-        // Biseau : bord du bas à y = epTot, coupe les biseaux si epTot < b
-        if (epTot < b) {
-          // Le biseau va de (b, 0) à (0, b) — équation : x + y = b (pour le coin haut-gauche)
-          // À y = epTot, x = b - epTot
-          const x_int = b - epTot;
-          path =
-            `M${(px+b)*SC},${py*SC}` +
-            ` L${(px+W-b)*SC},${py*SC}` +
-            ` L${(px+W-x_int)*SC},${(py+epTot)*SC}` +
-            ` L${(px+x_int)*SC},${(py+epTot)*SC} Z`;
-        } else {
-          path =
-            `M${(px+b)*SC},${py*SC}` +
-            ` L${(px+W-b)*SC},${py*SC}` +
-            ` L${(px+W)*SC},${(py+b)*SC}` +
-            ` L${(px+W)*SC},${(py+epTot)*SC}` +
-            ` L${px*SC},${(py+epTot)*SC}` +
-            ` L${px*SC},${(py+b)*SC} Z`;
-        }
-      } else {
-        // Arrondi : bord du bas à y = epTot, coupe les arcs si epTot < b
-        const rsc = b * SC;
-        if (epTot < b) {
-          // Arc top-left : center (b, b), radius b ; à y = epTot, x = b - √(epTot*(2*b - epTot))
-          const x_int = b - Math.sqrt(epTot * (2*b - epTot));
-          path =
-            `M${(px+b)*SC},${py*SC}` +
-            ` L${(px+W-b)*SC},${py*SC}` +
-            ` A${rsc},${rsc} 0 0,1 ${(px+W-x_int)*SC},${(py+epTot)*SC}` +
-            ` L${(px+x_int)*SC},${(py+epTot)*SC}` +
-            ` A${rsc},${rsc} 0 0,1 ${(px+b)*SC},${py*SC} Z`;
-        } else {
-          // epTot >= b : arc complet + rectangle dessous
-          path =
-            `M${(px+b)*SC},${py*SC}` +
-            ` L${(px+W-b)*SC},${py*SC}` +
-            ` A${rsc},${rsc} 0 0,1 ${(px+W)*SC},${(py+b)*SC}` +
-            ` L${(px+W)*SC},${(py+epTot)*SC}` +
-            ` L${px*SC},${(py+epTot)*SC}` +
-            ` L${px*SC},${(py+b)*SC}` +
-            ` A${rsc},${rsc} 0 0,1 ${(px+b)*SC},${py*SC} Z`;
-        }
-      }
-    } else {
-      path = `M${px*SC},${py*SC} L${(px+W)*SC},${py*SC} L${(px+W)*SC},${(py+epTot)*SC} L${px*SC},${(py+epTot)*SC} Z`;
-    }
-
-  } else if (S.nez === 'rtg') {
-    // RTG : bord du bas à y = epTot
-    const sagRtg   = Math.min(S.rtgArrondi || 20, W/2 - 0.5);
-    const Rrtg     = (W*W/4 + sagRtg*sagRtg) / (2*sagRtg);
-    const Rrpx     = Rrtg * SC;
-    const largeArc = sagRtg >= W/2 ? 1 : 0;
-    if (epTot < sagRtg) {
-      // L'arc passe en dessous de epTot → on coupe l'arc à y = epTot
-      // Centre de l'arc : (W/2, sagRtg + Rrtg) — wait, l'arc va de (0, sagRtg) à (W, sagRtg) et passe par (W/2, 0)
-      // En vérité le centre est en (W/2, sagRtg + sqrt(Rrtg²- (W/2)²)) soit (W/2, sagRtg + Rrtg - sagRtg) = (W/2, Rrtg)... non
-      // Si l'arc passe par (0, sagRtg), (W, sagRtg) et (W/2, 0), le centre est en (W/2, Rrtg) avec Rrtg² = (W/2)² + (Rrtg - 0)² ... hmm
-      // En fait : 3 points sur cercle - centre à mi-chemin x = W/2, y = ?
-      // (W/2)² + (sagRtg - cy)² = Rrtg² et (0)² + (0 - cy)² = Rrtg² → cy² = Rrtg² → cy = ±Rrtg
-      // Test : (W/2)² + (sagRtg - Rrtg)² = (W/2)² + Rrtg² - 2·Rrtg·sagRtg + sagRtg²
-      // doit = Rrtg², donc (W/2)² + sagRtg² = 2·Rrtg·sagRtg → Rrtg = ((W/2)² + sagRtg²)/(2·sagRtg) ✓
-      // Donc cy = Rrtg, pas (Rrtg + sagRtg)
-      const cy_arc = Rrtg;
-      const dy2 = Rrtg*Rrtg - (epTot - cy_arc)*(epTot - cy_arc);
-      if (dy2 <= 0) {
-        path = `M${px*SC},${py*SC} L${(px+W)*SC},${py*SC} L${(px+W)*SC},${(py+epTot)*SC} L${px*SC},${(py+epTot)*SC} Z`;
-      } else {
-        const dx_int = Math.sqrt(dy2);
-        const x_int_L = W/2 - dx_int;
-        const x_int_R = W/2 + dx_int;
-        // Arc partiel de (x_int_L, epTot) à (x_int_R, epTot) en passant par (W/2, 0)
-        path =
-          `M${(px+x_int_L)*SC},${(py+epTot)*SC}` +
-          ` A${Rrpx},${Rrpx} 0 0,0 ${(px+x_int_R)*SC},${(py+epTot)*SC} Z`;
-      }
-    } else {
-      path =
-        `M${px*SC},${(py+sagRtg)*SC}` +
-        ` A${Rrpx},${Rrpx} 0 ${largeArc},0 ${(px+W)*SC},${(py+sagRtg)*SC}` +
-        ` L${(px+W)*SC},${(py+epTot)*SC}` +
-        ` L${px*SC},${(py+epTot)*SC} Z`;
-    }
-
-  } else if (S.nez === 'casse') {
-    // Chamfer TGV : bord du bas à y = epTot
-    const nezD  = S.longueur * S.cabine / 100;
-    const faceH = S.hauteur - S.hauteur * S.nezH / 100;
-
-    let cham1 = 0, cham2 = 0, x_break = 0, useTwoAngles = false;
-    if (S.nezFaceType === 'incline' && S.showArretePli && S.arretePliPos > 0 && S.arretePliVal !== 0) {
-      const nH_p   = S.hauteur * S.nezH / 100;
-      const biaisL = Math.sqrt(nezD*nezD + nH_p*nH_p);
-      const P  = Math.min(Math.abs(S.arretePliPos), biaisL - 1);
-      const dv = Math.abs(S.arretePliVal);
-      const L1 = Math.sqrt(P*P + dv*dv);
-      const L2 = Math.sqrt((biaisL-P)*(biaisL-P) + dv*dv);
-      const ang1 = S.nezFaceAngle  * Math.PI / 180;
-      const ang2 = S.nezFaceAngle2 * Math.PI / 180;
-      cham1 = L2 * Math.tan(ang1);
-      cham2 = L1 * Math.tan(ang2);
-      const chamMaxTotal = W / 2 * 0.9;
-      if (cham1 + cham2 > chamMaxTotal) {
-        const sc_ = chamMaxTotal / (cham1 + cham2);
-        cham1 *= sc_; cham2 *= sc_;
-      }
-      x_break = nezD * L1 / (L1 + L2);
-      useTwoAngles = true;
-    }
-    const chamfer = useTwoAngles ? cham1 + cham2
-      : (S.nezFaceType === 'incline' ? Math.min(faceInclineOffset(faceH, nezD), W / 2 * 0.9) : 0);
-
-    if (chamfer > 0.5) {
-      // Le biseau va de (chamfer, 0) à (0, chamfer) — équation : x + y = chamfer (top-left)
-      // À y = epTot, x = chamfer - epTot
-      if (epTot < chamfer) {
-        const x_int = chamfer - epTot;
-        path =
-          `M${(px+chamfer)*SC},${py*SC}` +
-          ` L${(px+W-chamfer)*SC},${py*SC}` +
-          ` L${(px+W-x_int)*SC},${(py+epTot)*SC}` +
-          ` L${(px+x_int)*SC},${(py+epTot)*SC} Z`;
-      } else {
-        path =
-          `M${(px+chamfer)*SC},${py*SC}` +
-          ` L${(px+W-chamfer)*SC},${py*SC}` +
-          ` L${(px+W)*SC},${(py+chamfer)*SC}` +
-          ` L${(px+W)*SC},${(py+epTot)*SC}` +
-          ` L${px*SC},${(py+epTot)*SC}` +
-          ` L${px*SC},${(py+chamfer)*SC} Z`;
-      }
-    } else {
-      path = `M${px*SC},${py*SC} L${(px+W)*SC},${py*SC} L${(px+W)*SC},${(py+epTot)*SC} L${px*SC},${(py+epTot)*SC} Z`;
-    }
-  } else {
-    path = `M${px*SC},${py*SC} L${(px+W)*SC},${py*SC} L${(px+W)*SC},${(py+epTot)*SC} L${px*SC},${(py+epTot)*SC} Z`;
-  }
+  const lastP = norm[norm.length - 1];
+  path += ` L${(px + lastP.x)*SC},${(py + profH + epTot)*SC}`;
+  path += ` L${(px + norm[0].x)*SC},${(py + profH + epTot)*SC}`;
+  path += ` Z`;
 
   draw.path(path).fill('none').stroke({color:CUT, width:1.5});
-  label(px+2, py+epTot+8, `PARE-CHOCS (${W}mm × ${epTot}mm)`, 7);
-  cote(px, py + epTot, px + W, py + epTot, W+'mm', -4);
-  if (S.showCotes) cote(px - 4, py, px - 4, py + epTot, epTot+'mm', -4);
-  return W;
+  label(px + 2, py + profH + epTot + 8, `PARE-CHOCS (${Math.round(profW*10)/10}mm × ${epTot}mm)`, 7);
+  if (S.showCotes) {
+    cote(px, py + profH + epTot + 4, px + profW, py + profH + epTot + 4,
+         Math.round(profW*10)/10+'mm', 4);
+    cote(px - 4, py + profH, px - 4, py + profH + epTot, epTot+'mm', -4);
+  }
+  return profW;
 }
 
 // ═══════════════════════════════════════════════════
@@ -4006,7 +4065,9 @@ function drawPiecesBogies(px, py) {
 function drawFlancContour(px, py, isLoco) {
   const nezR = (isLoco && S.nez === 'plat' && S.showRadiusCoinsNez) ? S.radiusCoinsNez : 0;
   const L = S.longueur - nezR;
-  const H = S.toit === 'plat' ? S.hauteur - S.radiusCoins / 2 : S.hauteur;
+  // Toit plat : ajouter l'épaisseur du carton à la hauteur du flanc
+  // (pour compenser l'épaisseur du toit qui se pose dessus, hors radius coins)
+  const H = S.toit === 'plat' ? S.hauteur - S.radiusCoins / 2 + S.epaisseur : S.hauteur;
   const encH = (S.bogieEncoche && S.showBogies) ? (S.bogieEncH || 0) : 0;
   const Hf = H; // hauteur flanc (encoche découpée dans le bas, pas en extension)
   const sc = SC;
@@ -4339,11 +4400,12 @@ function _drawFenetresOneLevel(px, py, W, H, yPct, fhVal, levelIdx, xOffsetRatio
   const wPortesF = [Math.min(S.wPorte1||18,W*0.4), Math.min(S.wPorte2||18,W*0.4), Math.min(S.wPorte3||18,W*0.4)];
   const wP = wPortesF[0];
   let porteCenters = [];
-  {const ps=[S.portePosX,S.portePosX2,S.portePosX3]; for(let _i=0;_i<S.nbPortes;_i++){const _w=wPortesF[_i]; porteCenters.push(nezEnd+_w/2+margin+(W-nezEnd-2*margin-_w)*ps[_i]/100);}}
+  {const ps=[S.portePosX,S.portePosX2,S.portePosX3]; for(let _i=0;_i<S.nbPortes;_i++){const _w=wPortesF[_i]; porteCenters.push(_w/2+margin+(W-2*margin-_w)*ps[_i]/100);}}
 
   // Tous les blocs exclus (nez + portes), triés
   let blocked = [];
-  if (nezEnd > 0) blocked.push({ left: 0, right: nezEnd });
+  // Bloc nez retiré : les fenêtres peuvent s'étendre sur toute la largeur du flanc
+  // if (nezEnd > 0) blocked.push({ left: 0, right: nezEnd });
   porteCenters.forEach(cx => blocked.push({
     left:  Math.max(0, cx - wP/2 - margin),
     right: Math.min(W, cx + wP/2 + margin)
@@ -4410,17 +4472,30 @@ function _drawFenetresOneLevel(px, py, W, H, yPct, fhVal, levelIdx, xOffsetRatio
       const fenId = `fen_${levelIdx}_${i}_z${perZone.indexOf(perZone.find(p => p.x0 === x0))}`;
       const deletedList = S.fenDeleted || [];
       if (deletedList.indexOf(fenId) >= 0) continue;
+
+      // Mode relief : ne dessiner que la sous-couche réduite (pas la fenêtre pleine)
+      if (S._reliefMode) {
+        const sc2 = S.reliefScale / 100;
+        const rw = S.wFen * sc2, rh = fh * sc2;
+        reliefRect(fx + (S.wFen-rw)/2, fy + (fh-rh)/2 + S.reliefOffsetY, rw, rh, r * sc2);
+        continue;
+      }
+
       if (S.fenSplit) {
         // Double vitrage : 2 rectangles horizontaux (haut et bas), séparés au milieu
-        const halfH = (fh - 1) / 2; // -1mm pour la séparation
+        // Ratio = % de hauteur pour le panneau du HAUT (10-90%)
+        const ratio = (S.fenSplitRatio || 50) / 100;
+        const sepGap = 1; // 1mm de séparation entre les 2 panneaux
+        const topH = Math.max(2, (fh - sepGap) * ratio);
+        const botH = Math.max(2, (fh - sepGap) - topH);
         // Panneau haut : radius sur tous les coins sauf bas
         const rTop = r;
         if (rTop <= 0) {
-          cutRect(fx, fy, S.wFen, halfH, 0);
+          cutRect(fx, fy, S.wFen, topH, 0);
         } else {
           const dTop =
-            `M${fx*SC},${(fy+halfH)*SC}` +
-            ` L${(fx+S.wFen)*SC},${(fy+halfH)*SC}` +
+            `M${fx*SC},${(fy+topH)*SC}` +
+            ` L${(fx+S.wFen)*SC},${(fy+topH)*SC}` +
             ` L${(fx+S.wFen)*SC},${(fy+rTop)*SC}` +
             ` Q${(fx+S.wFen)*SC},${fy*SC} ${(fx+S.wFen-rTop)*SC},${fy*SC}` +
             ` L${(fx+rTop)*SC},${fy*SC}` +
@@ -4429,17 +4504,17 @@ function _drawFenetresOneLevel(px, py, W, H, yPct, fhVal, levelIdx, xOffsetRatio
           draw.path(dTop).fill('none').stroke({ color: CUT, width: 1.4 });
         }
         // Panneau bas : radius sur tous les coins sauf haut
-        const fyB = fy + halfH + 1;
+        const fyB = fy + topH + sepGap;
         if (rTop <= 0) {
-          cutRect(fx, fyB, S.wFen, halfH, 0);
+          cutRect(fx, fyB, S.wFen, botH, 0);
         } else {
           const dBot =
             `M${fx*SC},${fyB*SC}` +
             ` L${(fx+S.wFen)*SC},${fyB*SC}` +
-            ` L${(fx+S.wFen)*SC},${(fyB+halfH-rTop)*SC}` +
-            ` Q${(fx+S.wFen)*SC},${(fyB+halfH)*SC} ${(fx+S.wFen-rTop)*SC},${(fyB+halfH)*SC}` +
-            ` L${(fx+rTop)*SC},${(fyB+halfH)*SC}` +
-            ` Q${fx*SC},${(fyB+halfH)*SC} ${fx*SC},${(fyB+halfH-rTop)*SC}` +
+            ` L${(fx+S.wFen)*SC},${(fyB+botH-rTop)*SC}` +
+            ` Q${(fx+S.wFen)*SC},${(fyB+botH)*SC} ${(fx+S.wFen-rTop)*SC},${(fyB+botH)*SC}` +
+            ` L${(fx+rTop)*SC},${(fyB+botH)*SC}` +
+            ` Q${fx*SC},${(fyB+botH)*SC} ${fx*SC},${(fyB+botH-rTop)*SC}` +
             ' Z';
           draw.path(dBot).fill('none').stroke({ color: CUT, width: 1.4 });
         }
@@ -4627,11 +4702,20 @@ function drawPharesExport(px, py) {
   gCenters.forEach((gx, gi) => {
     if (S.phareDouble) {
       const d2 = d/2;
+      const orient = S.phareDoubleOrient || 'horizontal';
       const miroir = gi > midIdx;
-      const cxGrand = !miroir ? gx - esp/2 - d/2  : gx + esp/2 + d/2;
-      const cxPetit = !miroir ? gx + esp/2 + d2/2 : gx - esp/2 - d2/2;
-      draw.circle(d*SC).center(cxGrand*SC, yc*SC).fill('none').stroke({color:CUT,width:1.4});
-      draw.circle(d2*SC).center(cxPetit*SC, yc*SC).fill('none').stroke({color:CUT,width:1.4});
+      let cxGrand, cyGrand, cxPetit, cyPetit;
+      if (orient === 'vertical') {
+        cxGrand = gx; cxPetit = gx;
+        cyGrand = yc - esp/2 - d/2;
+        cyPetit = yc + esp/2 + d2/2;
+      } else {
+        cxGrand = !miroir ? gx - esp/2 - d/2  : gx + esp/2 + d/2;
+        cxPetit = !miroir ? gx + esp/2 + d2/2 : gx - esp/2 - d2/2;
+        cyGrand = yc; cyPetit = yc;
+      }
+      draw.circle(d*SC).center(cxGrand*SC, cyGrand*SC).fill('none').stroke({color:CUT,width:1.4});
+      draw.circle(d2*SC).center(cxPetit*SC, cyPetit*SC).fill('none').stroke({color:CUT,width:1.4});
     } else {
       if (S.phareForme === 'cercle') {
         draw.circle(d*SC).center(gx*SC, yc*SC).fill('none').stroke({color:CUT,width:1.4});
@@ -6091,7 +6175,7 @@ function drawPortes(px, py, W, H) {
   const isLoco = S.vehicle === 'loco';
   const nezOffset = (isLoco && S.nez !== 'plat') ? S.longueur * S.cabine / 100 + margin : 0;
   let centers = [];
-  {const ps=[S.portePosX,S.portePosX2,S.portePosX3]; for(let _i=0;_i<S.nbPortes;_i++){const _w=wPortesDP[_i]; centers.push(nezOffset+_w/2+margin+(W-nezOffset-2*margin-_w)*ps[_i]/100);}}
+  {const ps=[S.portePosX,S.portePosX2,S.portePosX3]; for(let _i=0;_i<S.nbPortes;_i++){const _w=wPortesDP[_i]; centers.push(_w/2+margin+(W-2*margin-_w)*ps[_i]/100);}}
 
   function drawOneDoor(ppx, pw) {
     const rr = Math.min(r * SC, pw * SC / 2, porteH * SC / 2);
@@ -6135,17 +6219,17 @@ function drawPortes(px, py, W, H) {
     const pi = porteIdx + 1; // 1-based
     if (S.porteDouble) {
       const hw = _wPi / 2;
-      drawOneDoor(ppx, hw);
-      drawOneDoor(ppx + hw, hw);
+      if (!S._reliefMode) drawOneDoor(ppx, hw);
+      if (!S._reliefMode) drawOneDoor(ppx + hw, hw);
       drawReliefDoor(ppx, hw, pi);
       drawReliefDoor(ppx + hw, hw, pi);
     } else {
-      drawOneDoor(ppx, _wPi);
+      if (!S._reliefMode) drawOneDoor(ppx, _wPi);
       drawReliefDoor(ppx, _wPi, pi);
     }
 
     // ── Trous mains montoires ──
-    if (S.showMainsMontoires) {
+    if (S.showMainsMontoires && !S._reliefMode) {
       const marg   = S.mainsMMarg;
       const esp    = S.mainsMEsp;
       const yC1    = py + H * S.mainsMY1 / 100; // y du trou haut
@@ -6179,11 +6263,12 @@ function drawRainures(px, py, W, H) {
   const nezOffset = nezEnd;
 
   let porteCenters = [];
-  {const ps=[S.portePosX,S.portePosX2,S.portePosX3]; for(let _i=0;_i<S.nbPortes;_i++){const _w=wPortesRN[_i]; porteCenters.push(nezOffset+_w/2+margin+(W-nezOffset-2*margin-_w)*ps[_i]/100);}}
+  {const ps=[S.portePosX,S.portePosX2,S.portePosX3]; for(let _i=0;_i<S.nbPortes;_i++){const _w=wPortesRN[_i]; porteCenters.push(_w/2+margin+(W-2*margin-_w)*ps[_i]/100);}}
 
   // Blocs à éviter
   let blocked = [];
-  if (nezEnd > 0) blocked.push({ left: 0, right: nezEnd });
+  // Bloc nez retiré : les fenêtres peuvent s'étendre sur toute la largeur du flanc
+  // if (nezEnd > 0) blocked.push({ left: 0, right: nezEnd });
   porteCenters.forEach((cx, _i) => blocked.push({
     left:  Math.max(0, cx - wPortesRN[_i]/2 - margin),
     right: Math.min(W, cx + wPortesRN[_i]/2 + margin)
@@ -6638,7 +6723,8 @@ function drawReliefLayer(px, py, lbl) {
 
   // Blocs exclus
   let blocked = [];
-  if (nezEnd > 0) blocked.push({ left: 0, right: nezEnd });
+  // Bloc nez retiré : les fenêtres peuvent s'étendre sur toute la largeur du flanc
+  // if (nezEnd > 0) blocked.push({ left: 0, right: nezEnd });
   porteCenters.forEach((cx, _i) => blocked.push({
     left:  Math.max(0, cx - wPortes[_i]/2 - margin),
     right: Math.min(W, cx + wPortes[_i]/2 + margin)
@@ -6652,12 +6738,15 @@ function drawReliefLayer(px, py, lbl) {
   });
 
   // ── Fenêtres et portes : déléguer aux mêmes fonctions que le flanc ──
-  // Mais adapté à la largeur W (longueur - 2*ep) et hauteur H (hauteur - ep)
-  // Sauvegarder et patcher S temporairement
+  // Mais en mode "relief" : on ne dessine que les sous-couches (reliefRect),
+  // pas les fenêtres pleines (cutRect)
+  // Adapté à la largeur W (longueur - 2*ep) et hauteur H (hauteur - ep)
   const _origL = S.longueur, _origH = S.hauteur;
   S.longueur = W; S.hauteur = H;
+  S._reliefMode = true;
   drawFenetres(px, py, W, H);
   drawPortes(px, py, W, H);
+  S._reliefMode = false;
   S.longueur = _origL; S.hauteur = _origH;
 }
 
@@ -6812,8 +6901,9 @@ function drawPatronMarchandise() {
   const container = document.getElementById('svg-patron');
   if (!container) return;
   container.innerHTML = '';
-  // Largeur estimée : 2 flancs capot + 2 flancs cabine + plancher + toit + capots latéraux
-  const totalW = MARGIN + L*2 + cabL*2 + W*2 + GAP*8 + MARGIN + 60;
+  // Largeur estimée : 2 flancs capot + 2 flancs cabine + plancher + toit + capots latéraux + faces cabine
+  const cabW_est = S.cabineLargeur || 60;
+  const totalW = MARGIN + L*2 + cabL*2 + W*2 + cabW_est*3 + GAP*12 + MARGIN + 60;
   const totalH = MARGIN + H*2 + W + GAP*4 + 600;
   draw = SVG().addTo('#svg-patron').size(totalW * SC, totalH * SC);
 
@@ -7639,7 +7729,8 @@ function drawPatron() {
     : 0;
   const totalW3 = Math.max(totalW2, r6TotalW, r3EndX, r3PreW, r4PareChocsW);
   // Hauteur jonction toit-nez (si applicable)
-  const jonctionH = (isLoco && S.nez === 'plat' && S.showRadiusCoinsNez)
+  const jonctionH = 0;  // Pièce JONCTION supprimée
+  const _unused_jonctionH = (isLoco && S.nez === 'plat' && S.showRadiusCoinsNez)
     ? S.radiusCoinsNez + 20
     : (isLoco && S.nez === 'rtg')
     ? (S.largeur - 2*S.epaisseur) / 2 + 20
@@ -7906,18 +7997,24 @@ function drawPatron() {
     rrect(posToit.x, posToit.y, caisseLong, td, 0, 'none', CUT, 1.5);
     label(posToit.x+2, posToit.y+2, `TOIT (déplié, ${Math.round(td*10)/10}mm)`, 7);
 
-    if (S.toit === 'coupole' && (S.coupoleEcras || 0) > 0) {
-      const ecras     = S.coupoleEcras / 100;
-      const flatWadj  = td * ecras;
-      const slopeWadj = (td - flatWadj) / 2;
-      const slopeLadj = Math.sqrt(slopeWadj * slopeWadj + th * th);
-      // Fold mark 1 : fin oblique gauche
-      foldLine(posToit.x, posToit.y + slopeLadj, posToit.x + caisseLong, posToit.y + slopeLadj);
-      // Fold mark 2 : fin plateau
-      foldLine(posToit.x, posToit.y + slopeLadj + flatWadj, posToit.x + caisseLong, posToit.y + slopeLadj + flatWadj);
-      if (S.showCotes) {
-        cote(posToit.x-4, posToit.y, posToit.x-4, posToit.y+slopeLadj, Math.round(slopeLadj*10)/10+'mm', -4);
-        cote(posToit.x-4, posToit.y+slopeLadj, posToit.x-4, posToit.y+slopeLadj+flatWadj, Math.round(flatWadj*10)/10+'mm', -4);
+    if (S.toit === 'coupole' && S.showFold) {
+      // Coupole : 1 ou 2 marques selon écrasement
+      const ecras = S.coupoleEcras || 0;
+      const W_int = S.largeur - 2*S.epaisseur;
+      if (ecras > 0) {
+        const flatWadj  = W_int * ecras / 100;
+        const slopeW    = (W_int - flatWadj) / 2;
+        const slopeLadj = Math.sqrt(slopeW * slopeW + th * th);
+        // 2 marques (fin pente gauche, fin plateau)
+        foldLine(posToit.x, posToit.y + slopeLadj, posToit.x + caisseLong, posToit.y + slopeLadj);
+        foldLine(posToit.x, posToit.y + slopeLadj + flatWadj, posToit.x + caisseLong, posToit.y + slopeLadj + flatWadj);
+        if (S.showCotes) {
+          cote(posToit.x-4, posToit.y, posToit.x-4, posToit.y+slopeLadj, Math.round(slopeLadj*10)/10+'mm', -4);
+          cote(posToit.x-4, posToit.y+slopeLadj, posToit.x-4, posToit.y+slopeLadj+flatWadj, Math.round(flatWadj*10)/10+'mm', -4);
+        }
+      } else {
+        // V renversé : 1 marque centrale
+        foldLine(posToit.x, posToit.y + td/2, posToit.x + caisseLong, posToit.y + td/2);
       }
     } else if (rab > 0 && S.showFold) {
       foldLine(posToit.x, posToit.y + rab, posToit.x + caisseLong, posToit.y + rab);
@@ -8100,20 +8197,19 @@ function drawPatron() {
     if (S.nez === 'rtg') {
       const inclin = S.rtgInclin || 30;
       const sag    = S.rtgArrondi || 20;
-      const H      = S.hauteur;
+      const hStart = Math.min(S.rtgHStart || 0, S.hauteur - 10); // limite raisonnable
+      const H      = S.hauteur - hStart;  // hauteur de la zone inclinée uniquement
       const esp    = S.bombageEsp || 5;
       const arcW   = Math.round(bombageArcLength(S.largeur, sag) * 10) / 10;
 
       // ── PIÈCE NEZ RTG : secteur d'anneau (arch warp) ──
-      // Ri = rayon intérieur (bord toit), Ro = rayon extérieur (bord plancher)
-      // inclin = différence de longueur entre les deux arcs = H × arcW / Ri
-      // Secteur d'anneau :
-      // - arc intérieur (toit) = arcW
-      // - arc extérieur (plancher) = arcW + inclin
-      // phi = demi-angle, Ri = rayon intérieur
+      // Ri = rayon intérieur (largeur droite plancher), Ro = rayon extérieur (bombage toit)
+      // arc intérieur (haut, court) = arcW − inclin = largeur effective du plancher
+      // arc extérieur (bas, long)  = arcW = bombageArcLength (bombage du toit déplié)
+      // phi = demi-angle, inclin = différence de longueur entre les deux arcs
       const phi = inclin / (2 * H);                    // demi-angle
-      const Ri  = Math.max(arcW / (2 * phi), H * 0.5); // Ri = arcW/(2*phi)
-      const Ro  = Ri + H;
+      const Ro  = Math.max(arcW / (2 * phi), H * 0.5); // Ro = arcW/(2*phi)
+      const Ri  = Math.max(0.1, Ro - H);
 
       // Centre au-dessus de la pièce
       // S'assurer que D.x (coin bas-gauche) >= MARGIN
@@ -8181,44 +8277,52 @@ function drawPatron() {
         }
         phareAlphas.forEach((alpha, gi) => {
           const miroir = gi > (nb-1)/2;
+          const orient = S.phareDoubleOrient || 'horizontal';
           if (S.phareDouble) {
             const d2       = d / 2; // petit phare
-            const dAlpha_g = (d/2)   / Rphare;
-            const dAlpha_p = (d2/2)  / Rphare;
-            const dEsp     = S.phareEsp / Rphare;
-            let alphaGrand, alphaPetit;
-            if (!miroir) {
-              alphaGrand = alpha + dEsp/2 + dAlpha_g;
-              alphaPetit = alpha - dEsp/2 - dAlpha_p;
+            let pgx, pgy, ppx, ppy;
+            if (orient === 'vertical') {
+              // Vertical : grand phare plus EXTÉRIEUR (vers Ro), petit plus INTÉRIEUR (vers Ri)
+              // sur le même angle. Séparation radiale = phareEsp + (d+d2)/2.
+              const Rgrand = Rphare - S.phareEsp/2 - d/2;
+              const Rpetit = Rphare + S.phareEsp/2 + d2/2;
+              pgx = cx + Rgrand*Math.cos(alpha);
+              pgy = cy + Rgrand*Math.sin(alpha);
+              ppx = cx + Rpetit*Math.cos(alpha);
+              ppy = cy + Rpetit*Math.sin(alpha);
             } else {
-              alphaPetit = alpha + dEsp/2 + dAlpha_p;
-              alphaGrand = alpha - dEsp/2 - dAlpha_g;
+              const dAlpha_g = (d/2)   / Rphare;
+              const dAlpha_p = (d2/2)  / Rphare;
+              const dEsp     = S.phareEsp / Rphare;
+              let alphaGrand, alphaPetit;
+              if (!miroir) {
+                alphaGrand = alpha + dEsp/2 + dAlpha_g;
+                alphaPetit = alpha - dEsp/2 - dAlpha_p;
+              } else {
+                alphaPetit = alpha + dEsp/2 + dAlpha_p;
+                alphaGrand = alpha - dEsp/2 - dAlpha_g;
+              }
+              pgx = cx + Rphare*Math.cos(alphaGrand);
+              pgy = cy + Rphare*Math.sin(alphaGrand);
+              ppx = cx + Rphare*Math.cos(alphaPetit);
+              ppy = cy + Rphare*Math.sin(alphaPetit);
             }
             // Grand phare
-            const pgx = cx + Rphare*Math.cos(alphaGrand);
-            const pgy = cy + Rphare*Math.sin(alphaGrand);
             draw.circle(d*SC).center(pgx*SC, pgy*SC).fill('none').stroke({color:CUT, width:1.2});
             // Petit phare
-            const ppx = cx + Rphare*Math.cos(alphaPetit);
-            const ppy = cy + Rphare*Math.sin(alphaPetit);
             draw.circle(d2*SC).center(ppx*SC, ppy*SC).fill('none').stroke({color:CUT, width:1.2});
-            // Contour global orienté selon la tangente à l'arc
+            // Contour global orienté selon l'axe G→P (vertical = direction radiale, horizontal = tangente à l'arc)
             if (S.phareContour) {
               const ep2 = S.phareContourEp;
               const R1  = d/2  + ep2;
               const R2  = d2/2 + ep2;
-              const RL  = !miroir ? R1 : R2;
-              const RR  = !miroir ? R2 : R1;
-              const cLx = !miroir ? pgx : ppx;
-              const cLy = !miroir ? pgy : ppy;
-              const cRx = !miroir ? ppx : pgx;
-              const cRy = !miroir ? ppy : pgy;
-              // Direction de L→R (axe principal du contour)
+              const cLx = pgx, cLy = pgy;
+              const cRx = ppx, cRy = ppy;
               const dx  = cRx - cLx, dy = cRy - cLy;
               const len = Math.sqrt(dx*dx + dy*dy) || 1;
-              const ax  = dx/len, ay = dy/len;   // axe principal
-              const nx  = -ay,    ny  = ax;       // normale (perpendiculaire)
-              // Points du contour : extrémités de la capsule
+              const ax  = dx/len, ay = dy/len;
+              const nx  = -ay,    ny  = ax;
+              const RL  = R1, RR = R2;
               const pL1x = (cLx - ax*RL + nx*RL)*SC, pL1y = (cLy - ay*RL + ny*RL)*SC;
               const pL2x = (cLx - ax*RL - nx*RL)*SC, pL2y = (cLy - ay*RL - ny*RL)*SC;
               const pR1x = (cRx + ax*RR + nx*RR)*SC, pR1y = (cRy + ay*RR + ny*RR)*SC;
@@ -8246,7 +8350,7 @@ function drawPatron() {
         });
       }
 
-      // ── Cales phares RTG : courbure = rtgArrondi (sagitta horizontale) ──
+      // ── Cales phares RTG : chaque cale a la forme locale du plancher à sa position ──
       if (S.showPhares && S.showCalePhare) {
         const d_    = S.diamePhare;
         const ep_c  = S.phareContourEp;
@@ -8255,41 +8359,71 @@ function drawPatron() {
         const caleW = Math.max(S.calePhareW, gWtot_ + 2);
         const eCarton = S.epaisseur;
         const extraH  = Math.max(0, S.calePhareH);
-        // La courbure de la face avant RTG = arc de rayon R_face
-        // avec sagitta = rtgArrondi sur largeur S.largeur
+        // Géométrie de l'arc du plancher RTG (vue de dessus)
+        const W_pl   = S.largeur;
         const sag_face = sag; // rtgArrondi
-        const R_face   = (S.largeur*S.largeur/4 + sag_face*sag_face) / (2*sag_face);
-        // Sagitta sous la largeur de la cale (centrée)
-        const sagCale  = R_face - Math.sqrt(Math.max(0, R_face*R_face - (caleW/2)*(caleW/2)));
-        const maxOff   = Math.round(sagCale * 10) / 10;
-        if (maxOff >= 0.3) {
-          const nbLayers = Math.ceil(maxOff / eCarton);
-          const nCales   = Math.max(1, S.nbPhares);
-          const caleY2   = r3y + r3h - extraH - maxOff - 4; // position fixe sous la pièce nez
-          const R_cale   = (caleW*caleW/4 + maxOff*maxOff) / (2*maxOff);
-          const steps2   = 24;
+        const R_face   = (W_pl*W_pl/4 + sag_face*sag_face) / (2*sag_face);
+        // Profondeur du plancher à une position x (0 ≤ x ≤ W_pl) :
+        // depth(x) = sag - (R_face - √(R_face² - (x - W_pl/2)²))
+        function depthAt(x) {
+          const dx = x - W_pl/2;
+          return sag_face - (R_face - Math.sqrt(Math.max(0, R_face*R_face - dx*dx)));
+        }
+        const nCales = Math.max(1, S.nbPhares);
+        // Positions X des phares sur le plancher (en mm sur la largeur loco)
+        const margPhare = S.phareMarg;
+        let xPhares = [];
+        if (nCales === 1) {
+          xPhares = [W_pl/2];
+        } else {
+          const step = (W_pl - 2*margPhare - d_) / (nCales - 1);
+          for (let i = 0; i < nCales; i++) xPhares.push(margPhare + d_/2 + i*step);
+        }
+        const steps2 = 24;
+        // Y de référence pour les cales
+        const caleY2 = r3y + r3h - extraH - sag_face - 4;
 
-          for (let i = 0; i < nCales; i++) {
-            const p1x2 = A.x + i * (B.x - A.x + GAP + caleW) - caleW/2;
-            // Courbe fixe en haut + rectangle plat en bas
-            let dPath2 = `M${p1x2*SC},${(caleY2+maxOff+extraH)*SC}`;
-            dPath2 += ` L${(p1x2+caleW)*SC},${(caleY2+maxOff+extraH)*SC}`;
-            for (let j = steps2; j >= 0; j--) {
-              const tx  = p1x2 + (j / steps2) * caleW;
-              const dx2 = tx - (p1x2 + caleW/2);
-              const off = R_cale - Math.sqrt(Math.max(0, R_cale*R_cale - dx2*dx2));
-              dPath2 += ` L${tx*SC},${(caleY2 + maxOff - off)*SC}`;
-            }
-            dPath2 += ' Z';
-            draw.path(dPath2).fill('#f5f0e8').stroke({color:CUT, width:1.4});
-            if (extraH > 0.5 && S.showFold)
-              foldLine(p1x2, caleY2 + maxOff, p1x2 + caleW, caleY2 + maxOff);
-            label(p1x2+1, caleY2-8, `CALE RTG ${i+1} ×${nbLayers}`, 6);
-            cote(p1x2, caleY2, p1x2+caleW, caleY2, caleW+'mm', 4);
+        for (let i = 0; i < nCales; i++) {
+          // Position du centre de la cale sur la largeur du plancher
+          const xc_pl = xPhares[i];
+          // Bornes de la cale (centrée sur xc_pl, largeur caleW)
+          const xL = xc_pl - caleW/2;
+          const xR = xc_pl + caleW/2;
+          // Échantillonner le profil du plancher dans cette plage
+          const sampOff = [];
+          let maxOff = 0;
+          for (let j = 0; j <= steps2; j++) {
+            const t = j / steps2;
+            const x = xL + t * (xR - xL);
+            const xClamped = Math.max(0, Math.min(W_pl, x));
+            const off = depthAt(xClamped);
+            sampOff.push(off);
+            if (off > maxOff) maxOff = off;
           }
-          draw.text(`${nbLayers}×${eCarton}mm = ${maxOff}mm  (sag arc=${sag_face}mm)`)
-            .move(A.x*SC, (caleY2+maxOff+extraH+3)*SC)
-            .font({family:'DM Mono,monospace', size:6, fill:COTE});
+          maxOff = Math.round(maxOff * 10) / 10;
+          if (maxOff < 0.3) continue;
+
+          const nbLayers = Math.ceil(maxOff / eCarton);
+          const p1x2 = A.x + i * (B.x - A.x + GAP + caleW) - caleW/2;
+
+          // Construire le path : base plate en bas, courbe INVERSÉE en haut
+          // (creuse là où le plancher est bombé, pour s'imbriquer contre la face interne)
+          // - Base plate à y = caleY + maxOff + extraH
+          // - Courbe haute à y = caleY + sampOff[j] (creuse au centre, plate sur les bords)
+          let dPath2 = `M${p1x2*SC},${(caleY2+maxOff+extraH)*SC}`;
+          dPath2 += ` L${(p1x2+caleW)*SC},${(caleY2+maxOff+extraH)*SC}`;
+          for (let j = steps2; j >= 0; j--) {
+            const tx = p1x2 + (j / steps2) * caleW;
+            const ty = caleY2 + sampOff[j];  // courbe inversée (creux où le plancher bombe)
+            dPath2 += ` L${tx*SC},${ty*SC}`;
+          }
+          dPath2 += ' Z';
+          draw.path(dPath2).fill('#f5f0e8').stroke({color:CUT, width:1.4});
+          if (extraH > 0.5 && S.showFold)
+            foldLine(p1x2, caleY2 + maxOff, p1x2 + caleW, caleY2 + maxOff);
+          label(p1x2+1, caleY2-8, `CALE RTG ${i+1} ×${nbLayers} (x=${Math.round(xc_pl)}mm)`, 6);
+          cote(p1x2, caleY2, p1x2+caleW, caleY2, caleW+'mm', 4);
+          cote(p1x2-5, caleY2, p1x2-5, caleY2+maxOff, maxOff+'mm', -4);
         }
       }
 
@@ -8397,7 +8531,153 @@ function drawPatron() {
         });
       }
 
-      curX += Math.max(B.x, C.x) - curX + GAP;
+      // Avancer curX au-delà de la pièce nez principale
+      curX = Math.max(B.x, C.x) + GAP;
+
+      // ── PIÈCE JUPE NEZ (zone basse verticale, sans inclinaison) ──
+      // Rectangle de largeur arcW (= bombage déplié) et hauteur rtgHStart
+      // Pliures verticales pour suivre le bombage horizontal (nFolds-1 pliures)
+      if (hStart > 0.01) {
+        const jupeY = r3y;
+        const jupeX = curX;
+        // Le rectangle a la largeur = arc extérieur Ro * 2*phi = arcW (par définition)
+        const jupeW = Ro * 2 * phi;
+        const jupeH = hStart;
+        // Contour
+        rrect(jupeX, jupeY, jupeW, jupeH, 0, 'none', CUT, 1.5);
+        // Pliures verticales : mêmes positions que les pliures radiales de la pièce nez
+        // (qui sont à t = i/nFolds pour i = 1..nFolds-1, soit en x = t * jupeW)
+        if (S.showFold) {
+          for (let i = 1; i < nFolds; i++) {
+            const t = i / nFolds;
+            const xi = jupeX + t * jupeW;
+            foldLine(xi, jupeY, xi, jupeY + jupeH);
+          }
+        }
+        label(jupeX + 2, jupeY + 2, 'JUPE NEZ', 7);
+        if (S.showCotes) {
+          cote(jupeX, jupeY - 3, jupeX + jupeW, jupeY - 3, Math.round(jupeW*10)/10+'mm', -3);
+          cote(jupeX - 3, jupeY, jupeX - 3, jupeY + jupeH, jupeH+'mm', -3);
+        }
+        curX = jupeX + jupeW + GAP;
+      }
+
+      // ── PIÈCE DESSOUS DU NEZ (plancher du nez RTG) ──
+      // Secteur d'anneau séparé : longueur d'arc extérieur = dessousNezL, hauteur = dessousNezH
+      if (S.showDessousNez) {
+        const dnH    = S.dessousNezH || 10;
+        const dnL    = S.dessousNezL || 100;
+        const dnEff  = (S.dessousNezEffilage || 0) / 100;  // 0 = pas effilé, 1 = lentille
+        const dnPhi  = phi; // même demi-angle pour conserver l'alignement
+        const dnRo   = dnL / (2 * dnPhi);
+        const dnRi   = Math.max(0.1, dnRo - dnH);
+        const dnRmid = (dnRi + dnRo) / 2;
+        const dnHalfH = (dnRo - dnRi) / 2;
+
+        const dnMinX = dnRo * Math.sin(dnPhi);
+        const dnLeftEdge = curX + dnMinX - dnRi * Math.sin(dnPhi);
+        const dnCx = dnLeftEdge + dnRi * Math.sin(dnPhi);
+        const dnCy = r3y - dnRi * Math.cos(dnPhi);
+
+        // Helper : facteur d'effilage à la position normalisée t ∈ [0, 1]
+        // À t=0 ou t=1 (bords) : f = 1 - dnEff (peut être 0)
+        // À t=0.5 (centre) : f = 1
+        // Interpolation : sin(π*t) qui vaut 0 aux bords et 1 au centre
+        function effilFactor(t) {
+          return 1 - dnEff * (1 - Math.sin(Math.PI * t));
+        }
+
+        // Si effilage = 0, garder les arcs purs (perf + précision)
+        if (dnEff < 0.01) {
+          const dnA = { x: dnCx - dnRi*Math.sin(dnPhi), y: dnCy + dnRi*Math.cos(dnPhi) };
+          const dnB = { x: dnCx + dnRi*Math.sin(dnPhi), y: dnCy + dnRi*Math.cos(dnPhi) };
+          const dnC = { x: dnCx + dnRo*Math.sin(dnPhi), y: dnCy + dnRo*Math.cos(dnPhi) };
+          const dnD = { x: dnCx - dnRo*Math.sin(dnPhi), y: dnCy + dnRo*Math.cos(dnPhi) };
+          const dnLargeArcFlag = dnPhi > Math.PI/2 ? 1 : 0;
+          const dnPath =
+            `M${dnA.x*SC},${dnA.y*SC}` +
+            ` A${dnRi*SC},${dnRi*SC} 0 ${dnLargeArcFlag} 0 ${dnB.x*SC},${dnB.y*SC}` +
+            ` L${dnC.x*SC},${dnC.y*SC}` +
+            ` A${dnRo*SC},${dnRo*SC} 0 ${dnLargeArcFlag} 1 ${dnD.x*SC},${dnD.y*SC}` +
+            ' Z';
+          draw.path(dnPath).fill('none').stroke({color:CUT, width:1.5});
+
+          label(dnA.x+2, dnA.y+2, 'DESSOUS NEZ', 7);
+          if (S.showCotes) {
+            const dnArcInt = Math.round(dnRi * 2 * dnPhi * 10) / 10;
+            const dnArcExt = Math.round(dnL * 10) / 10;
+            cote(dnA.x, dnA.y, dnB.x, dnA.y, dnArcInt+'mm', 4);
+            cote(dnD.x, dnD.y, dnC.x, dnD.y, dnArcExt+'mm', -4);
+          }
+          curX = Math.max(dnB.x, dnC.x) + GAP;
+        } else {
+          // Avec effilage : échantillonner les 2 arcs et interpoler les rayons
+          const N = 60; // nb de points par arc (assez pour une courbe lisse)
+          // Échantillonnage de l'arc INTÉRIEUR (gauche → droite)
+          const arcInt = [];
+          for (let i = 0; i <= N; i++) {
+            const t = i / N;
+            const alpha = (Math.PI/2 + dnPhi) - t * 2 * dnPhi;
+            const f = effilFactor(t);
+            const Ri_eff = dnRmid - dnHalfH * f;
+            arcInt.push({
+              x: dnCx + Ri_eff * Math.cos(alpha),
+              y: dnCy + Ri_eff * Math.sin(alpha)
+            });
+          }
+          // Échantillonnage de l'arc EXTÉRIEUR (droite → gauche pour fermer le path)
+          const arcExt = [];
+          for (let i = 0; i <= N; i++) {
+            const t = 1 - i / N; // inverse pour parcourir droite→gauche
+            const alpha = (Math.PI/2 + dnPhi) - t * 2 * dnPhi;
+            const f = effilFactor(t);
+            const Ro_eff = dnRmid + dnHalfH * f;
+            arcExt.push({
+              x: dnCx + Ro_eff * Math.cos(alpha),
+              y: dnCy + Ro_eff * Math.sin(alpha)
+            });
+          }
+
+          // Construire le path
+          let dnPath = `M${arcInt[0].x*SC},${arcInt[0].y*SC}`;
+          for (let i = 1; i < arcInt.length; i++) {
+            dnPath += ` L${arcInt[i].x*SC},${arcInt[i].y*SC}`;
+          }
+          // arcInt[N] = coin droit-bas de l'arc int (point B), passer à l'arc ext (point C)
+          for (let i = 0; i < arcExt.length; i++) {
+            dnPath += ` L${arcExt[i].x*SC},${arcExt[i].y*SC}`;
+          }
+          dnPath += ' Z';
+          draw.path(dnPath).fill('none').stroke({color:CUT, width:1.5});
+
+          // Coins équivalents A/B/C/D pour les fold marks et cotes
+          const dnA = arcInt[0];
+          const dnB = arcInt[arcInt.length - 1];
+          const dnC = arcExt[0];
+          const dnD = arcExt[arcExt.length - 1];
+
+          label(dnA.x+2, dnA.y+2, 'DESSOUS NEZ', 7);
+          if (S.showCotes) {
+            const dnArcInt = Math.round(dnRi * 2 * dnPhi * 10) / 10;
+            const dnArcExt = Math.round(dnL * 10) / 10;
+            cote(dnA.x, dnA.y, dnB.x, dnA.y, dnArcInt+'mm', 4);
+          }
+          curX = Math.max(dnB.x, dnC.x) + GAP;
+        }
+
+        // Fold marks radiales (alignées avec les pliures du nez principal)
+        // Tracées du point sur l'arc intérieur effilé au point sur l'arc extérieur effilé
+        for (let i = 1; i < nFolds; i++) {
+          const t     = i / nFolds;
+          const alpha = (Math.PI/2 + dnPhi) - t * 2 * dnPhi;
+          const f     = effilFactor(t);
+          const Ri_e  = dnRmid - dnHalfH * f;
+          const Ro_e  = dnRmid + dnHalfH * f;
+          const ix = dnCx + Ri_e*Math.cos(alpha), iy = dnCy + Ri_e*Math.sin(alpha);
+          const ox2= dnCx + Ro_e*Math.cos(alpha), oy2= dnCy + Ro_e*Math.sin(alpha);
+          draw.line(ix*SC, iy*SC, ox2*SC, oy2*SC).stroke({color:FOLD, width:0.9});
+        }
+      }
 
     } else if (S.nez === 'custom') {
       let customH = S.hauteur;
@@ -8963,11 +9243,8 @@ function drawPatron() {
   // Largeur réelle de la rangée 3
   r3EndX = curX + MARGIN;
 
-  // ---- Pièce jonction TOIT ↔ NEZ (strip-unfolding) ----
-  // Profil A = profil toit, Profil B = profil nez
-  // Chaque "colonne" = quart de cercle de rayon rJonctionToitNez
-  // Dépliage par triangulation bande à bande
-  if (isLoco && posNezHaut) {
+  // ---- Pièce jonction TOIT ↔ NEZ : SUPPRIMÉE (remplacée par la nouvelle géométrie pare-chocs)
+  if (false && isLoco && posNezHaut) {
     const rJ  = S.rJonctionToitNez || 8;
     const jy0 = r3y + r3h + GAP * 2;
     const jx0 = MARGIN;
@@ -9104,8 +9381,9 @@ function drawPatron() {
 
   // ---- Rangée 4 : cadres fenêtres
   {
-    // Décalage vertical si la pièce JONCTION toit-nez occupe la rangée (sinon les cadres se superposent dessus)
-    const jonctionVerticalSpace = (isLoco && S.nez !== 'plat' && S.nez !== 'rtg' && posNezHaut)
+    // Pièce JONCTION supprimée → pas de décalage
+    const jonctionVerticalSpace = 0;
+    const _unused_jonctionVerticalSpace = (isLoco && S.nez !== 'plat' && S.nez !== 'rtg' && posNezHaut)
       ? (Math.PI * (S.rJonctionToitNez || 8) / 2) + 14
       : 0;
     const r4y = (r3h > 0 ? r3y + r3h + GAP*2 : r2y + r2h + GAP*2) + jonctionVerticalSpace;
@@ -9447,6 +9725,19 @@ function loadConfig(event) {
 }
 
 function syncUIFromState() {
+  // Migration : si l'ancien showBombage était activé, refléter sur coinsNezType='bombe'
+  if (S.showBombage && (!S.coinsNezType || S.coinsNezType === 'none')) {
+    S.coinsNezType = 'bombe';
+  }
+  // Limiter les inclinaisons faces à 15° si l'arrête haute est pliée
+  const maxAngleSync = S.showArretePli ? 15 : 60;
+  ['nezFaceAngle','nezFaceAngle2'].forEach(id => {
+    const sliderEl = document.getElementById(id);
+    if (sliderEl) {
+      sliderEl.max = maxAngleSync;
+      if (parseFloat(S[id]) > maxAngleSync) S[id] = maxAngleSync;
+    }
+  });
   // Mettre à jour tous les sliders/checkboxes depuis S
   document.querySelectorAll('input[type="range"]').forEach(el => {
     if (el.id && S[el.id] !== undefined) {
@@ -9457,6 +9748,10 @@ function syncUIFromState() {
   });
   document.querySelectorAll('input[type="checkbox"]').forEach(el => {
     if (el.id && S[el.id] !== undefined) el.checked = S[el.id];
+  });
+  // Synchroniser les <select>
+  document.querySelectorAll('select').forEach(el => {
+    if (el.id && S[el.id] !== undefined) el.value = S[el.id];
   });
   // Mettre à jour les radio buttons (rbtn)
   document.querySelectorAll('[data-g]').forEach(el => {
@@ -9483,6 +9778,10 @@ function syncUIFromState() {
   if (_fCabX) _fCabX.style.display      = isMar ? 'block' : 'none';
   const _btnMar = _el('btn-nav-mar');
   if (_btnMar) _btnMar.style.display    = isMar ? '' : 'none';
+  const _btnNez = _el('btn-nav-nez');
+  if (_btnNez) _btnNez.style.display    = isLoco ? '' : 'none';
+  const _subFenCab = _el('sec-fen-cabine');
+  if (_subFenCab) _subFenCab.style.display = (isLoco || isMar) ? 'block' : 'none';
   // Relief
   _el('relief-opts').style.display = S.showRelief ? 'block' : 'none';
   _el('relief-portes-opts').style.display = S.showRelief ? 'block' : 'none';
@@ -11019,7 +11318,10 @@ if ('serviceWorker' in navigator) {
 <div id="mobile-drawer-overlay" onclick="closeDrawer()"></div>
 <div id="mobile-drawer">
   <div id="mobile-drawer-handle" onclick="closeDrawer()"></div>
-  <div id="mobile-drawer-title">Paramètres</div>
+  <div id="mobile-drawer-title">
+    <span id="mobile-drawer-title-text">Paramètres</span>
+    <button onclick="closeDrawer()" style="float:right;background:none;border:none;font-size:1.4rem;line-height:1;cursor:pointer;color:var(--accent);padding:0 4px;margin-top:-4px">×</button>
+  </div>
   <div id="mobile-drawer-content"></div>
 </div>
 
